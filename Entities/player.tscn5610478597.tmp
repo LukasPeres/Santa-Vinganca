@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://hvh3ntegm5t6"]
+
+[ext_resource type="Script" uid="uid://b3tgrhgpfl28a" path="res://Scripts/player.gd" id="1_tcnsb"]
+[ext_resource type="Texture2D" uid="uid://b7qx7heaiiufr" path="res://Sprites/Concepts/Papanel/sprite_idle_default.png" id="2_gb1tc"]
+[ext_resource type="Texture2D" uid="uid://silfmcfmhx6x" path="res://Sprites/Concepts/Papanel/ataque_melee.png" id="2_xd3k7"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tcnsb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_taegk"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(0, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kee72"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(64, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_prmdv"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(128, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xd3k7"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(0, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s1j76"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(64, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6jj0l"]
+atlas = ExtResource("2_xd3k7")
+region = Rect2(128, 0, 64, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xd3k7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_taegk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kee72")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_prmdv")
+}],
+"loop": false,
+"name": &"Ataque",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_gb1tc")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xd3k7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s1j76")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6jj0l")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}]
+
+[node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
+script = ExtResource("1_tcnsb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=37613180]
+shape = SubResource("CapsuleShape2D_tcnsb")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=818598190]
+sprite_frames = SubResource("SpriteFrames_xd3k7")
+animation = &"attack"
+autoplay = "Idle"

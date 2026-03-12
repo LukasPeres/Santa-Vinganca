@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://be4s37y88fepm"]
+
+[ext_resource type="Script" uid="uid://cjw5frxkjugqi" path="res://Scripts/enemy.gd" id="1_7qchm"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xci4f"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7qchm"]
+
+[node name="enemy" type="CharacterBody2D" unique_id=1879312191 groups=["enemy"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_7qchm")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1163471978]
+shape = SubResource("CapsuleShape2D_xci4f")
+debug_color = Color(0.9843137, 0, 0, 0.41960785)
+
+[node name="DamageArea" type="Area2D" parent="." unique_id=2002787052]
+collision_layer = 15
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=829456778]
+position = Vector2(20, 0)
+shape = SubResource("RectangleShape2D_7qchm")
+debug_color = Color(0.6846809, 0.5015789, 0, 0.41960785)
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=264053329]
+position = Vector2(12, -1)
+target_position = Vector2(0, 22)
+
+[connection signal="body_entered" from="DamageArea" to="." method="_on_damage_area_body_entered"]

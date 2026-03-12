@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dhcmh2ptqwk38"]
+
+[ext_resource type="PackedScene" uid="uid://hvh3ntegm5t6" path="res://Entities/player.tscn" id="1_mhtsl"]
+[ext_resource type="PackedScene" uid="uid://fbqhowj33s0" path="res://Entities/camera.tscn" id="2_w51g1"]
+[ext_resource type="PackedScene" uid="uid://be4s37y88fepm" path="res://Entities/enemy.tscn" id="3_4jv7b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mhtsl"]
+size = Vector2(226.8125, 15.5)
+
+[node name="SantaVinganca" type="Node2D" unique_id=913418570]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1368630371]
+collision_layer = 3
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=865685860]
+position = Vector2(115, 193)
+shape = SubResource("RectangleShape2D_mhtsl")
+debug_color = Color(0, 0.6432874, 0.30835393, 0.41960785)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=854800682]
+position = Vector2(337, 193)
+shape = SubResource("RectangleShape2D_mhtsl")
+debug_color = Color(0, 0.6432874, 0.30835393, 0.41960785)
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=976293804]
+position = Vector2(491, 193)
+shape = SubResource("RectangleShape2D_mhtsl")
+debug_color = Color(0, 0.6432874, 0.30835393, 0.41960785)
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=1348470320]
+position = Vector2(472, 132)
+shape = SubResource("RectangleShape2D_mhtsl")
+debug_color = Color(0, 0.6432874, 0.30835393, 0.41960785)
+
+[node name="player" parent="." unique_id=1350439359 instance=ExtResource("1_mhtsl")]
+position = Vector2(69, 86)
+
+[node name="Camera" parent="." unique_id=844746867 instance=ExtResource("2_w51g1")]
+position = Vector2(44, 120)
+limit_bottom = 200
+
+[node name="enemy" parent="." unique_id=1879312191 instance=ExtResource("3_4jv7b")]
+position = Vector2(190, 136)
