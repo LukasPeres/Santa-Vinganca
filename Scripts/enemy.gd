@@ -55,11 +55,24 @@ func handle_movement():
 # =========================================================
 func handle_ai():
 	if is_on_floor():
-		if is_on_wall() or not $RayCast2D.is_colliding():
+		# 1. Checagem de Parede:
+		# Só invertemos se a velocidade estiver "empurrando" contra a parede
+		if is_on_wall():
+			# Se estou tentando ir para a direita (1) e bati na parede, OU vice-versa
+			# Isso evita que ele inverta se já estiver se afastando
+			var collision = get_last_slide_collision()
+			if collision:
+				var normal = collision.get_normal()
+				# Se a parede está na frente da minha direção atual
+				if (direction > 0 and normal.x < 0) or (direction < 0 and normal.x > 0):
+					flip_direction()
+					return # Sai da função para não checar o abismo no mesmo frame
+
+		# 2. Checagem de Abismo (RayCast):
+		if not $RayCast2D.is_colliding():
 			flip_direction()
 
 	update_sensors()
-
 
 # =========================================================
 # Inverte a direção do inimigo
@@ -67,7 +80,10 @@ func handle_ai():
 # =========================================================
 func flip_direction():
 	direction *= -1
-
+	# IMPORTANTE: Atualiza a velocidade imediatamente para ele se afastar da parede
+	velocity.x = direction * SPEED 
+	# Inverte o sprite(ainda nao temos)
+	#$Sprite2D.flip_h = (direction == 1)
 
 # =========================================================
 # Mantém RayCast e Hitbox alinhados com a direção atual

@@ -21,22 +21,32 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
-#Constantes da Velocidade
+# --- CONFIGURAÇÕES (CONSTANTES) ---
+# Movimentação Base
 const SPEED = 150.0
 const JUMP_VELOCITY = -300.0
-const DASH_SPEED = 400
-const DASH_TIME = 0.15
 const GROUND_FRICTION = 900
 const AIR_FRICTION = 120
-const ATTACK_COOLDOWN_MS = 400
 
-var status: PlayerState #Chamando a variável de troca de estados
-var health = 5 #Vida
+# Mecânicas Especiais
+const DASH_SPEED = 400
+const DASH_TIME = 0.15
+const ATTACK_COOLDOWN_MS = 400
+const MAX_DASHES = 1 # <--- Adicionado para o sistema de pulo
+
+# --- ESTADOS E ATRIBUTOS (VARIÁVEIS) ---
+var status: PlayerState
+var health = 5
 var is_dead = false
-var dash_timer = 0
+
+# --- CONTROLE DE TEMPO E INPUT ---
+var dash_timer = 0.0
+var dash_count = 0 # <--- Adicionado para contar os dashes
 var input_direction = 0
+var last_attack_timer = 0.0 # msec usa float/int grande
+
+# --- EQUIPAMENTO ---
 var current_weapon = WeaponType.melee
-var last_attack_timer = 0.0
 
 #Função que se inicia quando o jogo começa
 func _ready() -> void:
@@ -46,13 +56,17 @@ func _ready() -> void:
 
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
-
+	update_ground_resources() # resetar habilidades
 	apply_gravity(delta)      # física
 	update_state(delta)       # lógica da state machine
 	check_weapon_swap()
 	update_animation_offsets()# visual
 
 	move_and_slide()          # movimento final
+
+func update_ground_resources():
+	if is_on_floor():
+		dash_count = 0
 
 #Gravidade
 func apply_gravity(delta):
@@ -211,6 +225,7 @@ func go_to_attack_state():
 func go_to_dash_state():
 	status = PlayerState.dash
 	dash_timer = DASH_TIME
+	dash_count += 1
 	
 	hitbox.monitoring = false
 	
@@ -232,8 +247,7 @@ func wants_attack():
 	return false
 
 func wants_dash():
-	return Input.is_action_just_pressed("dash") 
-
+	return Input.is_action_just_pressed("dash") and can_dash()
 
 
 #Movimentação
@@ -352,3 +366,6 @@ func update_animation_offsets():
 
 		PlayerState.idle, PlayerState.walk:
 			sprite.offset.y = -1
+			
+func can_dash() -> bool:
+	return dash_count < MAX_DASHES
