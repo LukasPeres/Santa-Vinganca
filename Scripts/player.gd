@@ -28,6 +28,7 @@ const DASH_SPEED = 400
 const DASH_TIME = 0.15
 const GROUND_FRICTION = 900
 const AIR_FRICTION = 120
+const ATTACK_COOLDOWN_MS = 400
 
 var status: PlayerState #Chamando a variável de troca de estados
 var health = 5 #Vida
@@ -35,6 +36,7 @@ var is_dead = false
 var dash_timer = 0
 var input_direction = 0
 var current_weapon = WeaponType.melee
+var last_attack_timer = 0.0
 
 #Função que se inicia quando o jogo começa
 func _ready() -> void:
@@ -51,6 +53,24 @@ func _physics_process(delta):
 	update_animation_offsets()# visual
 
 	move_and_slide()          # movimento final
+
+#Gravidade
+func apply_gravity(delta):
+	if not is_on_floor():
+		velocity += get_gravity() * 0.8 * delta
+
+func update_state(delta):
+	match status:
+		PlayerState.idle:
+			idle_state()
+		PlayerState.walk:
+			walk_state()
+		PlayerState.jump:
+			jump_state()
+		PlayerState.attack:
+			attack_state()
+		PlayerState.dash:
+			dash_state()
 
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
@@ -144,19 +164,25 @@ func attack_state():
 			go_to_walk_state()
 
 func dash_state():
-
 	dash_timer -= get_physics_process_delta_time()
+	
+	# O SEGREDO: Em cada frame do dash, nós forçamos a velocidade horizontal
+	# e ZERAMOS a vertical (velocity.y = 0). 
+	# Isso anula o efeito da gravidade que foi aplicado um milissegundo antes.
+	var direction = -1 if sprite.flip_h else 1
+	velocity.x = direction * DASH_SPEED
+	velocity.y = 0 
 
 	if dash_timer <= 0:
+		# Saída suave para não deslizar no sabão
+		velocity.x *= 0.3
 		
+		# Transição de saída (Mantendo seu padrão de funções)
 		if not is_on_floor():
-			go_to_jump_state()
-			return
-		
-		if velocity.x == 0:
-			go_to_idle_state()
+			status = PlayerState.jump
 		else:
-			go_to_walk_state()
+			if velocity.x == 0: go_to_idle_state()
+			else: go_to_walk_state()
 
 func go_to_idle_state():
 	status = PlayerState.idle #Vai para o estado parado
@@ -194,6 +220,23 @@ func go_to_dash_state():
 	
 	sprite.play("Idle") # depois você pode colocar animação de dash
 
+func wants_jump():
+	return Input.is_action_just_pressed("jump")
+
+func wants_attack():
+	var current_time = Time.get_ticks_msec()
+	if Input.is_action_just_pressed("attack"):
+		if current_time - last_attack_timer >= ATTACK_COOLDOWN_MS:
+			last_attack_timer = current_time # Registra o momento do ataque
+			return true
+	return false
+
+func wants_dash():
+	return Input.is_action_just_pressed("dash") 
+
+
+
+#Movimentação
 func move():
 	input_direction = Input.get_axis("left", "right")
 	var direction = input_direction
@@ -201,7 +244,7 @@ func move():
 	if direction:
 		velocity.x = direction * SPEED
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, 60)
 	
 	#Garante que os sprites e a hitbox virem pra left e right, respectivamente
 	if direction < 0:
@@ -211,6 +254,8 @@ func move():
 		sprite.flip_h = false
 		hitbox.scale.x = 1
 
+
+#Sistema das Armas
 func check_weapon_swap():
 
 	if Input.is_action_just_pressed("weapon_1"):
@@ -244,12 +289,15 @@ func shoot_elf():
 
 	var bullet = preload("res://Entities/elf_bullet.tscn").instantiate()
 	get_parent().add_child(bullet)
-
-	bullet.global_position = global_position
-
-	var direction = -1 if sprite.flip_h else 1
-	bullet.global_position = global_position + Vector2(20 * direction, 0)
-	bullet.direction = direction
+	
+	# 1. Primeiro definimos a direção baseada no sprite
+	var dir = -1 if sprite.flip_h else 1
+	
+	# 2. Agora usamos "dir" para posicionar a bala um pouco à frente do player
+	bullet.global_position = global_position + Vector2(20 * dir, 0)
+	
+	# 3. Chamamos a função de lançamento que criamos na bala
+	bullet.launch(dir)
 
 #hitbox do ataque, so funciona no grupo enemy
 func _on_hitbox_body_entered(body: Node2D) -> void:
@@ -304,31 +352,3 @@ func update_animation_offsets():
 
 		PlayerState.idle, PlayerState.walk:
 			sprite.offset.y = -1
-
-func wants_jump():
-	return Input.is_action_just_pressed("jump")
-
-func wants_attack():
-	return Input.is_action_just_pressed("attack")
-
-func wants_dash():
-	return Input.is_action_just_pressed("dash") 
-
-func update_state(delta):
-	match status:
-		PlayerState.idle:
-			idle_state()
-		PlayerState.walk:
-			walk_state()
-		PlayerState.jump:
-			jump_state()
-		PlayerState.attack:
-			attack_state()
-		PlayerState.dash:
-			dash_state()
-
-func apply_gravity(delta):
-
-	if not is_on_floor():
-		velocity += get_gravity() * delta
-		velocity.x = move_toward(velocity.x, 0, SPEED * 0.12)

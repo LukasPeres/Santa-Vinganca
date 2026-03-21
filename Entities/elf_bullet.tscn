@@ -12,3 +12,9 @@ script = ExtResource("1_sr4st")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=114769972]
 shape = SubResource("SeparationRayShape2D_x4jyj")
 debug_color = Color(0.6634427, 0.5132613, 5.7756904e-07, 0.41960785)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1422196685]
+position = Vector2(-1, 9)
+rect = Rect2(-10, -10, 24, 22)
+
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

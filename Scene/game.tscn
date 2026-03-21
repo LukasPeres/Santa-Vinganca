@@ -8,23 +8,15 @@
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("1_mhtsl")]
-position = Vector2(1552, -80)
+position = Vector2(55, 125)
 collision_mask = 1
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("2_w51g1")]
 position = Vector2(44, 120)
 limit_bottom = 200
 
-[node name="enemy" parent="." unique_id=1879312191 instance=ExtResource("3_4jv7b")]
-position = Vector2(1280, 128)
-collision_mask = 1
-
 [node name="enemy2" parent="." unique_id=444369075 instance=ExtResource("3_4jv7b")]
 position = Vector2(1192, 136)
-collision_mask = 1
-
-[node name="enemy3" parent="." unique_id=1930868866 instance=ExtResource("3_4jv7b")]
-position = Vector2(1240, 136)
 collision_mask = 1
 
 [node name="enemy4" parent="." unique_id=2134917523 instance=ExtResource("3_4jv7b")]

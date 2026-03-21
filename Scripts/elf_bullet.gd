@@ -1,28 +1,42 @@
 extends CharacterBody2D
 
+# Variáveis de controle do projétil
 var direction = 1
-
-const THROW_SPEED = 220
-const THROW_UP = -250
-const GRAVITY = 900
+const THROW_SPEED = 120
+const THROW_UP = -400
+const GRAVITY = 900 
 
 func _ready():
+	# Deixamos vazio porque o Player vai configurar a bala via launch()
+	pass
 
+# Esta função é a que o Player chama logo após dar o spawn
+func launch(dir):
+	direction = dir
 	velocity.x = direction * THROW_SPEED
 	velocity.y = THROW_UP
 
-
 func _physics_process(delta):
-
+	# Aplica a gravidade frame a frame para criar o arco
 	velocity.y += GRAVITY * delta
-
+	
+	# Move a bala usando a física do Godot
 	move_and_slide()
 
+	# Sistema de Colisão
 	for i in get_slide_collision_count():
-
 		var collision = get_slide_collision(i)
 		var body = collision.get_collider()
 
 		if body.is_in_group("enemy"):
-			body.take_damage(1, global_position)
+			# Se o objeto tiver a função de tomar dano, ele toma
+			if body.has_method("take_damage"):
+				body.take_damage(1, global_position)
+			queue_free() # Some ao acertar inimigo
+		else:
+			# Se bater no chão ou parede (qualquer coisa que não seja inimigo)
 			queue_free()
+
+# Função que você conectou pelo sinal do nó VisibleOnScreenNotifier2D
+func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
+	queue_free()
