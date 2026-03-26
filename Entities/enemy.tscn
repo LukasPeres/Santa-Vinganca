@@ -8,7 +8,6 @@
 
 [node name="enemy" type="CharacterBody2D" unique_id=1879312191 groups=["enemy"]]
 collision_layer = 4
-collision_mask = 2
 script = ExtResource("1_7qchm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1163471978]
@@ -16,7 +15,8 @@ shape = SubResource("CapsuleShape2D_xci4f")
 debug_color = Color(0.9843137, 0, 0, 0.41960785)
 
 [node name="DamageArea" type="Area2D" parent="." unique_id=2002787052]
-collision_layer = 15
+collision_layer = 0
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=829456778]
 position = Vector2(20, 0)

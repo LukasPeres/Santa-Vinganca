@@ -3,7 +3,7 @@ extends CharacterBody2D
 var direction = 1
 const SPEED = 500
 
-func _physics_process(delta):
+func _physics_process(_delta):
 
 	velocity.x = direction * SPEED
 	move_and_slide()

@@ -36,6 +36,9 @@ const MAX_DASHES = 1 # <--- Adicionado para o sistema de pulo
 const WALL_JUMP_VELOCITY = -250.0 # Força para cima
 const WALL_JUMP_PUSHBACK = 250.0 # Força para longe da parede
 const WALL_JUMP_LOCK_TIME = 0.30 # Tempo cda trava
+const WALL_SLIDE_SPEED = 50.0 # Velocidade máxima de descida na parede
+const INVINCIBILITY_TIME = 1.0 # 1 segundo de invencibilidade
+const KNOCKBACK_FREEZE_TIME = 0.2 # Tempo que o player perde o controle ao ser atingido
 
 # --- ESTADOS E ATRIBUTOS (VARIÁVEIS) ---
 var status: PlayerState
@@ -47,7 +50,9 @@ var dash_timer = 0.0
 var dash_count = 0 # <--- Adicionado para contar os dashes
 var input_direction = 0
 var last_attack_timer = 0.0 # msec usa float/int grande
-var wall_jump_timer = 0.0        # O cronômetro da trava
+var wall_jump_timer = 0.0 # O cronômetro da trava
+var invincibility_timer = 0.0
+var knockback_timer = 0.0
 
 # --- EQUIPAMENTO ---
 var current_weapon = WeaponType.melee
@@ -61,6 +66,7 @@ func _ready() -> void:
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
 	update_timers(delta)
+	handle_wall_slide(delta) # wall slide
 	update_ground_resources() # resetar habilidades
 	apply_gravity(delta)      # física
 	update_state(delta)       # lógica da state machine
@@ -78,7 +84,7 @@ func apply_gravity(delta):
 	if not is_on_floor():
 		velocity += get_gravity() * 0.8 * delta
 
-func update_state(delta):
+func update_state(_delta):
 	match status:
 		PlayerState.idle:
 			idle_state()
@@ -195,6 +201,10 @@ func attack_state():
 			go_to_walk_state()
 
 func dash_state():
+	# Se tomar dano no meio do dash, o dash cancela
+	if knockback_timer > 0: 
+		status = PlayerState.jump
+		return
 	dash_timer -= get_physics_process_delta_time()
 	
 	# O SEGREDO: Em cada frame do dash, nós forçamos a velocidade horizontal
@@ -282,13 +292,32 @@ func handle_wall_jump() -> bool:
 		
 		return true # Wall jump aconteceu!
 	return false # Não estava na parede
+
+func handle_wall_slide(_delta):
+	# Só desliza se: estiver no ar, encostado na parede e CAINDO
+	if is_on_wall() and not is_on_floor() and velocity.y > 0:
+		# Se a velocidade de queda for maior que o limite, a gente trava no limite
+		if velocity.y > WALL_SLIDE_SPEED:
+			velocity.y = WALL_SLIDE_SPEED
 	
 func update_timers(delta):
 	if wall_jump_timer > 0:
 		wall_jump_timer -= delta
+	if invincibility_timer > 0:
+		invincibility_timer -= delta
+		# Efeito visual: piscar o personagem
+		sprite.visible = not sprite.visible if invincibility_timer > 0 else true
+	else:
+		sprite.visible = true # Garante que ele termine visível
+
+	if knockback_timer > 0:
+		knockback_timer -= delta
 		
 #Movimentação
 func move():
+	# Adicionamos o knockback_timer aqui
+	if wall_jump_timer > 0 or knockback_timer > 0: 
+		return
 	# Se o timer for maior que 0, não lemos o input do jogador para o X
 	if wall_jump_timer > 0:
 		return
@@ -371,8 +400,16 @@ func _on_animated_sprite_2d_frame_changed() -> void:
 
 #Sistema de vida e Knockback recebido pelo player
 func take_damage(amount, from_position):
-	if is_dead:
+	if is_dead or invincibility_timer > 0:
 		return
+	# Ativa os timers
+	invincibility_timer = INVINCIBILITY_TIME
+	knockback_timer = KNOCKBACK_FREEZE_TIME
+	
+	# Aplica o empurrão (Knockback)
+	var knock_dir = sign(global_position.x - from_position.x)
+	velocity.x = knock_dir * 250 # Força horizontal
+	velocity.y = -200           # Força vertical (pulinho)
 	
 	health -= amount
 	print("Player vida:", health)

@@ -7,7 +7,7 @@ func _ready() -> void:
 	get_target()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	# Verifica se o player ainda existe
 	if not is_instance_valid(target):
 		get_target()

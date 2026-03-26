@@ -46,7 +46,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xd3k7"]
 
 [node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
-collision_mask = 2
+collision_layer = 2
 script = ExtResource("1_tcnsb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=37613180]
