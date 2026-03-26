@@ -33,6 +33,9 @@ const DASH_SPEED = 400
 const DASH_TIME = 0.15
 const ATTACK_COOLDOWN_MS = 400
 const MAX_DASHES = 1 # <--- Adicionado para o sistema de pulo
+const WALL_JUMP_VELOCITY = -250.0 # Força para cima
+const WALL_JUMP_PUSHBACK = 250.0 # Força para longe da parede
+const WALL_JUMP_LOCK_TIME = 0.30 # Tempo cda trava
 
 # --- ESTADOS E ATRIBUTOS (VARIÁVEIS) ---
 var status: PlayerState
@@ -44,6 +47,7 @@ var dash_timer = 0.0
 var dash_count = 0 # <--- Adicionado para contar os dashes
 var input_direction = 0
 var last_attack_timer = 0.0 # msec usa float/int grande
+var wall_jump_timer = 0.0        # O cronômetro da trava
 
 # --- EQUIPAMENTO ---
 var current_weapon = WeaponType.melee
@@ -56,6 +60,7 @@ func _ready() -> void:
 
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
+	update_timers(delta)
 	update_ground_resources() # resetar habilidades
 	apply_gravity(delta)      # física
 	update_state(delta)       # lógica da state machine
@@ -101,9 +106,13 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 		return
 		
 	#Quando o pulo é acionado, mudamos para o estado de pulo
-	if wants_jump() and is_on_floor():
-		go_to_jump_state()
-		return
+	if wants_jump():
+		if is_on_floor():
+			go_to_jump_state()
+			return
+		elif handle_wall_jump(): # Tenta o Wall Jump se não estiver no chão
+			status = PlayerState.jump # Muda o estado para jump
+			return
 		
 	#Quando a velocidade é diferente de 0, mudamos para o estado de andar
 	if velocity.x != 0:
@@ -124,9 +133,13 @@ func walk_state():
 		return
 	
 	#Quando o pulo é acionado, mudamos para o estado de pulo
-	if wants_jump() and is_on_floor():
-		go_to_jump_state()
-		return
+	if wants_jump():
+		if is_on_floor():
+			go_to_jump_state()
+			return
+		elif handle_wall_jump(): # Tenta o Wall Jump se não estiver no chão
+			status = PlayerState.jump # Muda o estado para jump
+			return
 
 	#Quando a velocidade é = 0, mudamos para o estado parado
 	if velocity.x == 0:
@@ -136,6 +149,10 @@ func walk_state():
 func jump_state():
 	move()
 	
+	# Permite pular de novo se bater em uma parede no ar
+	if wants_jump() and handle_wall_jump():
+		return # O handle_wall_jump já aplicou a velocidade
+		
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -249,9 +266,32 @@ func wants_attack():
 func wants_dash():
 	return Input.is_action_just_pressed("dash") and can_dash()
 
-
+func handle_wall_jump() -> bool:
+	# 1. Checa se está na parede e NO AR
+	if is_on_wall() and not is_on_floor():
+		var wall_normal = get_wall_normal() # Retorna a direção OPOSTA à parede	
+		# 2. Aplica o impulso (Normal.x empurra para longe da parede)
+		velocity.x = wall_normal.x * WALL_JUMP_PUSHBACK
+		velocity.y = WALL_JUMP_VELOCITY
+		# 2. LIGA A TRAVA: O player não vai conseguir mudar o X por 0.15s
+		wall_jump_timer = WALL_JUMP_LOCK_TIME
+		#Sprite inverte
+		sprite.flip_h = (wall_normal.x < 0)
+		#Depois do walljump, é possivel fazer outro dash
+		#dash_count = 0 
+		
+		return true # Wall jump aconteceu!
+	return false # Não estava na parede
+	
+func update_timers(delta):
+	if wall_jump_timer > 0:
+		wall_jump_timer -= delta
+		
 #Movimentação
 func move():
+	# Se o timer for maior que 0, não lemos o input do jogador para o X
+	if wall_jump_timer > 0:
+		return
 	input_direction = Input.get_axis("left", "right")
 	var direction = input_direction
 	#Caso esteja apertando alguma direção, velocidade horizontal é aplicada
