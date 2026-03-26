@@ -1,30 +1,55 @@
 [gd_scene format=3 uid="uid://be4s37y88fepm"]
 
 [ext_resource type="Script" uid="uid://cjw5frxkjugqi" path="res://Scripts/enemy.gd" id="1_7qchm"]
+[ext_resource type="Texture2D" uid="uid://jp354ovcuqt" path="res://Sprites/Personagens/Penguim_robo/Pinguim.png" id="2_5bdg5"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xci4f"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_0ifcb"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"Ataque",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_5bdg5")
+}],
+"loop": false,
+"name": &"Idle",
+"speed": 5.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7qchm"]
+size = Vector2(38, 37)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xci4f"]
+radius = 20.0
+height = 64.0
 
 [node name="enemy" type="CharacterBody2D" unique_id=1879312191 groups=["enemy"]]
 collision_layer = 4
 script = ExtResource("1_7qchm")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1163471978]
-shape = SubResource("CapsuleShape2D_xci4f")
-debug_color = Color(0.9843137, 0, 0, 0.41960785)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1340548280]
+sprite_frames = SubResource("SpriteFrames_0ifcb")
+animation = &"Idle"
+autoplay = "Idle"
 
 [node name="DamageArea" type="Area2D" parent="." unique_id=2002787052]
 collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=829456778]
-position = Vector2(20, 0)
+position = Vector2(39, 12)
 shape = SubResource("RectangleShape2D_7qchm")
 debug_color = Color(0.6846809, 0.5015789, 0, 0.41960785)
 
 [node name="RayCast2D" type="RayCast2D" parent="." unique_id=264053329]
-position = Vector2(12, -1)
-target_position = Vector2(0, 22)
+position = Vector2(23, 9)
+target_position = Vector2(1, 50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1163471978]
+shape = SubResource("CapsuleShape2D_xci4f")
+debug_color = Color(0.9843137, 0, 0, 0.41960785)
 
 [connection signal="body_entered" from="DamageArea" to="." method="_on_damage_area_body_entered"]
