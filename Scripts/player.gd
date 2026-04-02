@@ -23,11 +23,19 @@ enum WeaponType{
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
 # --- CONFIGURAÇÕES (CONSTANTES) ---
+const COYOTE_TIME = 0.15 # 150ms é o padrão "justo" para plataformas
+var coyote_timer = 0.0    # O cronómetro que vai diminuir no ar
+var slope_timer = 0.0
+const SLOPE_CONFIRMATION_TIME = 0.1 # Tempo mínimo para "confirmar" que é rampa
+
 # Movimentação Base
 const SPEED = 150.0
 const JUMP_VELOCITY = -300.0
 const GROUND_FRICTION = 900
 const AIR_FRICTION = 120
+const SLIDE_ACCEL = 2000.0
+const MAX_SLIDE_SPEED = 200.0
+const SLIDE_JUMP_BOOST = 1.3
 
 # Mecânicas Especiais
 const DASH_SPEED = 400
@@ -74,6 +82,7 @@ func _physics_process(delta):
 	check_weapon_swap()
 	update_animation_offsets()# visual
 
+	floor_snap_length = 8.0 if velocity.y >= 0 else 0.0
 	move_and_slide()          # movimento final
 
 func update_ground_resources():
@@ -97,6 +106,8 @@ func update_state(_delta):
 			attack_state()
 		PlayerState.dash:
 			dash_state()
+		PlayerState.slide:
+			slide_state()
 
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
@@ -114,18 +125,27 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 		
 	#Quando o pulo é acionado, mudamos para o estado de pulo
 	if wants_jump():
-		if is_on_floor():
+		# A condição agora é: Chão OU Timer de tolerância
+		if is_on_floor() or coyote_timer > 0:
 			go_to_jump_state()
 			return
-		elif handle_wall_jump(): # Tenta o Wall Jump se não estiver no chão
-			status = PlayerState.jump # Muda o estado para jump
+		elif handle_wall_jump():
+			status = PlayerState.jump
 			return
 		
 	#Quando a velocidade é diferente de 0, mudamos para o estado de andar
 	if velocity.x != 0:
 		go_to_walk_state()
 		return
-
+		
+	if is_on_steep_slope() and velocity.y >= 0:
+		slope_timer += get_physics_process_delta_time()
+		if slope_timer >= SLOPE_CONFIRMATION_TIME:
+			go_to_slide_state()
+			slope_timer = 0.0 # Reseta para a próxima
+			return
+	else:
+		slope_timer = 0.0 # Se saiu da rampa ou o chão ficou reto, reseta o tempo
 		
 func walk_state():
 	move()
@@ -142,17 +162,27 @@ func walk_state():
 	
 	#Quando o pulo é acionado, mudamos para o estado de pulo
 	if wants_jump():
-		if is_on_floor():
+		# A condição agora é: Chão OU Timer de tolerância
+		if is_on_floor() or coyote_timer > 0:
 			go_to_jump_state()
 			return
-		elif handle_wall_jump(): # Tenta o Wall Jump se não estiver no chão
-			status = PlayerState.jump # Muda o estado para jump
+		elif handle_wall_jump():
+			status = PlayerState.jump
 			return
 
 	#Quando a velocidade é = 0, mudamos para o estado parado
 	if velocity.x == 0:
 		go_to_idle_state()
 		return
+	
+	if is_on_steep_slope() and velocity.y >= 0:
+		slope_timer += get_physics_process_delta_time()
+		if slope_timer >= SLOPE_CONFIRMATION_TIME:
+			go_to_slide_state()
+			slope_timer = 0.0 # Reseta para a próxima
+			return
+	else:
+		slope_timer = 0.0 # Se saiu da rampa ou o chão ficou reto, reseta o tempo
 	
 	
 func jump_state():
@@ -228,6 +258,35 @@ func dash_state():
 			if velocity.x == 0: go_to_idle_state()
 			else: go_to_walk_state()
 
+func slide_state():
+	var n = get_floor_normal()
+	
+	if not is_on_floor():
+		status = PlayerState.jump
+		return
+
+	# 1. Aceleração da rampa
+	velocity.x += n.x * SLIDE_ACCEL * get_physics_process_delta_time()
+	velocity.x = clamp(velocity.x, -MAX_SLIDE_SPEED, MAX_SLIDE_SPEED)
+
+
+	if wants_jump():
+		print("Pulo com Momentum! Vel:", velocity.x)
+		if is_on_floor() or coyote_timer > 0:
+			go_to_jump_state()
+			return
+		elif handle_wall_jump():
+			status = PlayerState.jump
+			return
+
+	# 3. Saída por Terreno (Chão reto)
+	if not is_on_steep_slope():
+		if abs(velocity.x) > 100:
+			go_to_walk_state()
+		else:
+			go_to_idle_state()
+		return
+
 func go_to_idle_state():
 	status = PlayerState.idle #Vai para o estado parado
 	hitbox.monitoring = false #Garante que nesse modo, a hitbox vai estar off
@@ -239,12 +298,11 @@ func go_to_walk_state():
 	sprite.play("Idle")
 	
 func go_to_jump_state():
-	if not is_on_floor():
-		return
 	status = PlayerState.jump
 	hitbox.monitoring = false
 	velocity.y = JUMP_VELOCITY
 	sprite.play("Idle")
+	coyote_timer = 0.0
 	
 func go_to_attack_state():
 	status = PlayerState.attack
@@ -265,6 +323,12 @@ func go_to_dash_state():
 	
 	sprite.play("Idle") # depois você pode colocar animação de dash
 
+func go_to_slide_state():
+	status = PlayerState.slide
+	print("--- SLIDE ATIVADO! Inclinação: ", get_floor_normal().x)
+	sprite.play("Idle") # Substitua pela animação do Pietro depois
+	hitbox.monitoring = false
+	
 func wants_jump():
 	return Input.is_action_just_pressed("jump")
 
@@ -303,7 +367,19 @@ func handle_wall_slide(_delta):
 		if velocity.y > WALL_SLIDE_SPEED:
 			velocity.y = WALL_SLIDE_SPEED
 	
+func is_on_steep_slope() -> bool:
+	if is_on_floor():
+		var n = get_floor_normal()
+		return abs(n.x) > 0.15 # Detecta qualquer inclinação
+	return false
+	
 func update_timers(delta):
+	# Lógica do Coyote Time
+	if is_on_floor():
+		coyote_timer = COYOTE_TIME # Enquanto toca no chão, o tempo é máximo
+	else:
+		coyote_timer -= delta      # No ar, o tempo começa a esgotar-se
+		
 	if wall_jump_timer > 0:
 		wall_jump_timer -= delta
 	if invincibility_timer > 0:
@@ -318,27 +394,31 @@ func update_timers(delta):
 	
 #Movimentação
 func move():
-	# Adicionamos o knockback_timer aqui
-	if wall_jump_timer > 0 or knockback_timer > 0: 
-		return
-	# Se o timer for maior que 0, não lemos o input do jogador para o X
-	if wall_jump_timer > 0:
-		return
-	input_direction = Input.get_axis("left", "right")
-	var direction = input_direction
-	#Caso esteja apertando alguma direção, velocidade horizontal é aplicada
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, 60)
+	if wall_jump_timer > 0 or knockback_timer > 0: return
 	
-	#Garante que os sprites e a hitbox virem pra left e right, respectivamente
-	if direction < 0:
-		sprite.flip_h = true
-		hitbox.scale.x = -1
-	elif direction > 0:
-		sprite.flip_h = false
-		hitbox.scale.x = 1
+	var dir = Input.get_axis("left", "right")
+	
+	if dir:
+		var speed_multiplier = 1.2 if is_on_steep_slope() else 1.0
+		
+		# Lógica de Controle de Momentum
+		if not is_on_floor() and abs(velocity.x) > SPEED:
+			# Se você estiver indo para o mesmo lado do momentum, mantém a força
+			if sign(dir) == sign(velocity.x):
+				velocity.x = move_toward(velocity.x, dir * MAX_SLIDE_SPEED, 2)
+			else:
+				# Se apertar para o lado OPOSTO, você tem controle e freia o impulso
+				velocity.x = move_toward(velocity.x, dir * SPEED, 15) 
+		else:
+			# Movimento normal
+			velocity.x = dir * SPEED * speed_multiplier
+			
+		sprite.flip_h = (dir < 0)
+		hitbox.scale.x = -1 if dir < 0 else 1
+	else:
+		# Freio: No ar o freio é menor para não parar seco
+		var friction = 60 if is_on_floor() else 15
+		velocity.x = move_toward(velocity.x, 0, friction)
 
 
 #Sistema das Armas
