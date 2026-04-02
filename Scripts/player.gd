@@ -7,7 +7,8 @@ enum PlayerState{
 	walk,
 	jump,
 	attack,
-	dash
+	dash,
+	slide
 }
 
 #State Machine das armas
@@ -124,6 +125,7 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	if velocity.x != 0:
 		go_to_walk_state()
 		return
+
 		
 func walk_state():
 	move()
@@ -151,7 +153,8 @@ func walk_state():
 	if velocity.x == 0:
 		go_to_idle_state()
 		return
-		
+	
+	
 func jump_state():
 	move()
 	
@@ -312,7 +315,7 @@ func update_timers(delta):
 
 	if knockback_timer > 0:
 		knockback_timer -= delta
-		
+	
 #Movimentação
 func move():
 	# Adicionamos o knockback_timer aqui

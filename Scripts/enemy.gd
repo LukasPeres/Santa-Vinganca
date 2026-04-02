@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+@onready var sprite = $AnimatedSprite2D
+
 # Constantes físicas do inimigo
 const GRAVITY = 900
 const KNOCKBACK_FORCE = 120 # força horizontal do knockback
@@ -83,8 +85,9 @@ func flip_direction():
 	# IMPORTANTE: Atualiza a velocidade imediatamente para ele se afastar da parede
 	velocity.x = direction * SPEED 
 	# Inverte o sprite(ainda nao temos)
-	#$Sprite2D.flip_h = (direction == 1)
-
+	if sprite:
+		sprite.flip_h = (direction == -1)
+		
 # =========================================================
 # Mantém RayCast e Hitbox alinhados com a direção atual
 # Responsabilidade única: sincronizar sensores
