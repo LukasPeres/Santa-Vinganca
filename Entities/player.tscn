@@ -4,7 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://b7qx7heaiiufr" path="res://Sprites/Concepts/Papanel/sprite_idle_default.png" id="2_gb1tc"]
 [ext_resource type="Texture2D" uid="uid://dvwibl470mnb1" path="res://Sprites/Concepts/Papanel/ataque_melee_funcionando-Sheet.png" id="2_xd3k7"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tcnsb"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
+size = Vector2(20, 30)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_taegk"]
 atlas = ExtResource("2_xd3k7")
@@ -51,11 +52,11 @@ floor_constant_speed = true
 script = ExtResource("1_tcnsb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=37613180]
-shape = SubResource("CapsuleShape2D_tcnsb")
+shape = SubResource("RectangleShape2D_taegk")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=818598190]
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Ataque"
+animation = &"Idle"
 autoplay = "Idle"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]
