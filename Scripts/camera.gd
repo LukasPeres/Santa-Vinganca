@@ -4,6 +4,8 @@ var target: Node2D
 
 
 func _ready() -> void:
+	limit_left = 0
+	limit_bottom = 208
 	get_target()
 
 
@@ -23,3 +25,18 @@ func get_target():
 		return   # NÃO dá erro todo frame
 
 	target = nodes[0]
+
+func set_limits(l, r, t, b):
+	limit_left = l
+	limit_right = r
+	limit_top = t
+	limit_bottom = b
+	print("Limites atualizados: ", l, r, t, b) # Adicione esse print para debugar no console
+
+func reset_limits():
+	# Retorna aos valores que você usa na fase comum
+	limit_left = 0
+	limit_right = 1000000 
+	limit_top = -1000000
+	limit_bottom = 208 # O seu valor ideal
+	print("Câmera resetada para a Fase 2")

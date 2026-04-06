@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b5x6u5t8jb8al"]
+
+[ext_resource type="Script" uid="uid://so6o7cn7tf4r" path="res://Scripts/arena_boss.gd" id="1_jdtgp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0bxrd"]
+size = Vector2(20, 91)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oj378"]
+size = Vector2(2, 138)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bspgu"]
+size = Vector2(2, 136)
+
+[node name="arena_boss" type="Node2D" unique_id=347159132]
+script = ExtResource("1_jdtgp")
+
+[node name="gatilho_entrada" type="Area2D" parent="." unique_id=1532924968]
+collision_layer = 8
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="gatilho_entrada" unique_id=2015549624]
+position = Vector2(705, -45)
+shape = SubResource("RectangleShape2D_0bxrd")
+
+[node name="paredes_invisiveis" type="StaticBody2D" parent="." unique_id=1417069719]
+collision_mask = 2
+
+[node name="paredeD" type="CollisionShape2D" parent="paredes_invisiveis" unique_id=1232232953]
+position = Vector2(1, -69)
+shape = SubResource("RectangleShape2D_oj378")
+
+[node name="paredeE" type="CollisionShape2D" parent="paredes_invisiveis" unique_id=784744832]
+position = Vector2(762, -68)
+shape = SubResource("RectangleShape2D_bspgu")
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=859165756]
+position = Vector2(561, -31)
+
+[connection signal="body_entered" from="gatilho_entrada" to="." method="_on_gatilho_entrada_body_entered"]
