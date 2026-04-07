@@ -10,6 +10,8 @@ const SPEED = 60
 
 # Estado interno
 var direction = -1
+var health = 2
+var fase_atual = 1 # Começa em 1 (vinculado ao pai)
 
 func _ready():
 	add_to_group("enemy")
@@ -52,18 +54,36 @@ func flip_direction():
 # Recebe dano e REPASSA para o Pai (Snowboss)
 # =========================================================
 func take_damage(amount, from_position, _is_projectile = false):
-	# O corpo não tem vida própria, ele avisa o Snowboss (Pai)
-	var pai = get_parent()
-	if pai and pai.has_method("take_damage"):
-		pai.take_damage(amount)
-	
-	# Sofre o impacto visual/físico do golpe
+	flash_damage()
+	if fase_atual == 1:
+		# Na Fase 1, repassa o dano para a vida global do pai
+		if get_parent().has_method("take_damage"):
+			get_parent().take_damage(amount)
+	else:
+		# Na Fase 2, sofre dano individual
+		health -= amount
+		# O PRINT QUE VOCÊ PEDIU:
+		print(name, " tomou dano! Vida restante: ", health)
+		
+		if health <= 0:
+			die()
+
 	apply_knockback(from_position)
 
 func apply_knockback(from_position):
 	var knockback_direction = sign(global_position.x - from_position.x)
 	velocity.x = knockback_direction * KNOCKBACK_FORCE
 	velocity.y = KNOCKBACK_UP
+
+func die():
+	print(name, " FOI DESTRUÍDO!")
+	queue_free()
+	
+func flash_damage():
+	if sprite:
+		sprite.modulate = Color(10, 10, 10) # Fica muito brilhante (branco)
+		await get_tree().create_timer(0.1).timeout
+		sprite.modulate = Color(1, 1, 1) # Volta ao normal
 
 # Chamado pelo Pai no início da Fase 2
 func mudar_para_fase_2():
