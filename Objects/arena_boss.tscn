@@ -1,18 +1,20 @@
 [gd_scene format=3 uid="uid://b5x6u5t8jb8al"]
 
 [ext_resource type="Script" uid="uid://so6o7cn7tf4r" path="res://Scripts/arena_boss.gd" id="1_jdtgp"]
+[ext_resource type="PackedScene" uid="uid://bawur11ruo6f2" path="res://Entities/snowboss.tscn" id="2_00cq0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0bxrd"]
 size = Vector2(20, 91)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oj378"]
-size = Vector2(2, 138)
+size = Vector2(1.9599857, 999.06274)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bspgu"]
-size = Vector2(2, 136)
+size = Vector2(0.6234026, 174)
 
 [node name="arena_boss" type="Node2D" unique_id=347159132]
 script = ExtResource("1_jdtgp")
+boss_cena = ExtResource("2_00cq0")
 
 [node name="gatilho_entrada" type="Area2D" parent="." unique_id=1532924968]
 collision_layer = 8
@@ -26,14 +28,20 @@ shape = SubResource("RectangleShape2D_0bxrd")
 collision_mask = 2
 
 [node name="paredeD" type="CollisionShape2D" parent="paredes_invisiveis" unique_id=1232232953]
-position = Vector2(1, -69)
+position = Vector2(336, -89)
+shape = SubResource("RectangleShape2D_oj378")
+
+[node name="paredeT" type="CollisionShape2D" parent="paredes_invisiveis" unique_id=1944695878]
+position = Vector2(477.0742, -177.03934)
+rotation = 1.5800265
+scale = Vector2(0.99999976, 0.99999976)
 shape = SubResource("RectangleShape2D_oj378")
 
 [node name="paredeE" type="CollisionShape2D" parent="paredes_invisiveis" unique_id=784744832]
-position = Vector2(762, -68)
+position = Vector2(763, -86)
 shape = SubResource("RectangleShape2D_bspgu")
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=859165756]
-position = Vector2(561, -31)
+position = Vector2(531, -27)
 
 [connection signal="body_entered" from="gatilho_entrada" to="." method="_on_gatilho_entrada_body_entered"]

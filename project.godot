@@ -27,6 +27,7 @@ window/stretch/mode="canvas_items"
 player=""
 enemy=""
 main_camera=""
+boss=""
 
 [input]
 

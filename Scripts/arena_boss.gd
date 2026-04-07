@@ -1,5 +1,7 @@
 extends Node2D
 
+@export var boss_cena: PackedScene 
+@onready var spawn_point = $Marker2D
 @onready var paredes = $paredes_invisiveis
 @onready var gatilho = $gatilho_entrada
 
@@ -32,7 +34,7 @@ func ativar_evento_boss():
 		
 		# --- CONFIGURAÇÃO DOS LIMITES ---
 		# Ajuste esses números conforme o tamanho da arena do Pietro
-		var limite_esq = centro_x   # Esquerda
+		var limite_esq = centro_x + 336   # Esquerda
 		var limite_dir = centro_x + 763  # Direita
 		var limite_sup = centro_y - 600  # CIMA (Quanto menor o nº, mais sobe)
 		var limite_inf = centro_y + 30  # BAIXO (Quanto maior o nº, mais desce)
@@ -40,5 +42,13 @@ func ativar_evento_boss():
 		# Aplica os 4 limites na ordem correta: (Esquerda, Direita, Topo, Base)
 		cam.set_limits(limite_esq, limite_dir, limite_sup, limite_inf)
 	paredes.set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
+# --- SPAWN SEGURO ---
+	if boss_cena:
+		var boss = boss_cena.instantiate()
+		# Usamos o call_deferred para adicionar o boss sem erro de física
+		get_parent().call_deferred("add_child", boss)
+		# Definimos a posição. Se der erro de 'null', verifique o nome do Marker2D
+		boss.global_position = spawn_point.global_position
 
-	gatilho.queue_free()
+	# Mudamos para call_deferred para evitar o erro "flushing queries"
+	gatilho.call_deferred("queue_free")
