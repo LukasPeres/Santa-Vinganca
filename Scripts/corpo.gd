@@ -1,98 +1,51 @@
 extends CharacterBody2D
 
-@onready var sprite = $AnimatedSprite2D
-
-# Constantes físicas (Padronizadas com seu Enemy)
-const GRAVITY = 900
-const KNOCKBACK_FORCE = 150 
-const KNOCKBACK_UP = -150   
-const SPEED = 60            
-
-# Estado interno
-var direction = -1
-var health = 2
-var fase_atual = 1 # Começa em 1 (vinculado ao pai)
+@onready var sprite = $Sprite2D
 
 func _ready():
 	add_to_group("enemy")
 
-func _physics_process(delta):
-	apply_gravity(delta)
-	handle_movement()
-	handle_ai()
-	move_and_slide()
+func _physics_process(_delta):
+	# Na Fase 1, ele não executa física própria, apenas segue o pai.
+	# Na Fase 2, move_and_slide será chamado aqui.
+	if get_parent().name != "snowboss": # Se não for mais filho do snowboss
+		move_and_slide()
 
-func apply_gravity(delta):
-	if not is_on_floor():
-		velocity.y += GRAVITY * delta
-
-func handle_movement():
-	if is_on_floor():
-		velocity.x = direction * SPEED
-
-func handle_ai():
-	if is_on_floor():
-		# Checagem de Parede: Inverte a direção ao bater
-		if is_on_wall():
-			var collision = get_last_slide_collision()
-			if collision:
-				var normal = collision.get_normal()
-				# Verifica se a parede está à frente da direção atual
-				if (direction > 0 and normal.x < 0) or (direction < 0 and normal.x > 0):
-					flip_direction()
-
-# =========================================================
-# Inverte a direção e o visual
-# =========================================================
-func flip_direction():
-	direction *= -1
-	velocity.x = direction * SPEED 
+func atualizar_direcao(dir):
 	if sprite:
-		sprite.flip_h = (direction == 1) # Inverte conforme a lógica do seu sprite
-
-# =========================================================
-# Recebe dano e REPASSA para o Pai (Snowboss)
-# =========================================================
-func take_damage(amount, from_position, _is_projectile = false):
-	flash_damage()
-	if fase_atual == 1:
-		# Na Fase 1, repassa o dano para a vida global do pai
-		if get_parent().has_method("take_damage"):
-			get_parent().take_damage(amount)
-	else:
-		# Na Fase 2, sofre dano individual
-		health -= amount
-		# O PRINT QUE VOCÊ PEDIU:
-		print(name, " tomou dano! Vida restante: ", health)
-		
-		if health <= 0:
-			die()
-
-	apply_knockback(from_position)
-
-func apply_knockback(from_position):
-	var knockback_direction = sign(global_position.x - from_position.x)
-	velocity.x = knockback_direction * KNOCKBACK_FORCE
-	velocity.y = KNOCKBACK_UP
-
-func die():
-	print(name, " FOI DESTRUÍDO!")
-	queue_free()
+		sprite.flip_h = (dir == -1)
 	
+	# 1. Inverte o RemoteTransform (Pescoço/Cabeça)
+	if has_node("RemoteTransform2D"):
+		$RemoteTransform2D.position.x = abs($RemoteTransform2D.position.x) * dir
+		
+	# 2. Inverte o HitboxSoco (A área da Martelada)
+	if has_node("HitboxSoco"):
+		$HitboxSoco.position.x = abs($HitboxSoco.position.x) * dir
+		# Opcional: Se o Hitbox tiver um CollisionShape não centralizado, 
+		# ele acompanhará a posição do pai HitboxSoco.
+		
+	# 3. Inverte o PontoImpacto (Onde nascem as bolas de neve)
+	if has_node("PontoImpacto"):
+		$PontoImpacto.position.x = abs($PontoImpacto.position.x) * dir
+		
+		
 func flash_damage():
-	if sprite:
-		sprite.modulate = Color(10, 10, 10) # Fica muito brilhante (branco)
-		await get_tree().create_timer(0.1).timeout
-		sprite.modulate = Color(1, 1, 1) # Volta ao normal
+	var tween = create_tween()
+	tween.tween_property(sprite, "modulate", Color(10, 10, 10), 0.05)
+	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
 
-# Chamado pelo Pai no início da Fase 2
-func mudar_para_fase_2():
-	print("Corpo: Fase 2 iniciada!")
+func take_damage(amount, _from_pos = Vector2.ZERO, _is_projectile = false):
+	flash_damage() # O corpo pisca para dar feedback visual
+	
+	# Se ainda for Fase 1 (filho do snowboss), repassa o dano para o HP global
+	if get_parent().has_method("take_damage"):
+		get_parent().take_damage(amount) 
+	else:
+		# Lógica de vida própria da Fase 2 (quando o pai já morreu)
+		# health -= amount...
+		pass
 
-
-
-func _on_area_dano_body_entered(body: Node2D) -> void:
+func _on_area_dano_body_entered(body):
 	if body.is_in_group("player"):
-		# Garante que o player receba o dano e a posição para o knockback dele
-		if body.has_method("take_damage"):
-			body.take_damage(1, global_position)
+		body.take_damage(1, global_position)

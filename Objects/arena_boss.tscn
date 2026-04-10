@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b5x6u5t8jb8al"]
 
 [ext_resource type="Script" uid="uid://so6o7cn7tf4r" path="res://Scripts/arena_boss.gd" id="1_jdtgp"]
-[ext_resource type="PackedScene" uid="uid://bawur11ruo6f2" path="res://Entities/snowboss.tscn" id="2_00cq0"]
+[ext_resource type="PackedScene" uid="uid://dnxsurkawvpkp" path="res://Entities/snowboss2.tscn" id="2_00cq0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0bxrd"]
 size = Vector2(20, 91)
@@ -42,6 +42,6 @@ position = Vector2(763, -86)
 shape = SubResource("RectangleShape2D_bspgu")
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=859165756]
-position = Vector2(531, -27)
+position = Vector2(537, -43)
 
 [connection signal="body_entered" from="gatilho_entrada" to="." method="_on_gatilho_entrada_body_entered"]

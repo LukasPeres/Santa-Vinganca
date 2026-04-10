@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://d0ab2sewpd5fa"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_t4ly4"]
+
+[node name="snowball_arc" type="CharacterBody2D" unique_id=774603723]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1336934098]
+shape = SubResource("SegmentShape2D_t4ly4")

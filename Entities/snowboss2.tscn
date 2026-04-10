@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://dnxsurkawvpkp"]
+
+[ext_resource type="Script" uid="uid://d3p27v5k6regm" path="res://Scripts/snowboss_2.gd" id="1_1bah1"]
+[ext_resource type="Script" uid="uid://7sm0sie80j5i" path="res://Scripts/corpo.gd" id="1_olyxe"]
+[ext_resource type="Texture2D" uid="uid://b4mojgwvjwf85" path="res://Sprites/Personagens/Boneco_neve/boneco de neve.png" id="2_1bah1"]
+[ext_resource type="Script" uid="uid://c60h88s2piyoq" path="res://Scripts/cabeca.gd" id="3_82hnu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sakgq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u1tvg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u7u5a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pxkc7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0raev"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_f8ao0"]
+
+[node name="snowboss" type="CharacterBody2D" unique_id=1505547716]
+collision_layer = 2
+script = ExtResource("1_1bah1")
+
+[node name="corpo" type="CharacterBody2D" parent="." unique_id=1889616616]
+collision_layer = 4
+script = ExtResource("1_olyxe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="corpo" unique_id=158761331]
+shape = SubResource("RectangleShape2D_sakgq")
+disabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="corpo" unique_id=1200579789]
+position = Vector2(2, -19.000002)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("2_1bah1")
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="corpo" unique_id=614747861]
+position = Vector2(0, -18)
+remote_path = NodePath("../../cabeca")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="corpo" unique_id=1962789860]
+
+[node name="area_dano" type="Area2D" parent="corpo" unique_id=1267115924]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="corpo/area_dano" unique_id=989050587]
+shape = SubResource("RectangleShape2D_u1tvg")
+
+[node name="PontoImpacto" type="Marker2D" parent="corpo" unique_id=2100955329]
+position = Vector2(22, 9)
+
+[node name="HitboxSoco" type="Area2D" parent="corpo" unique_id=1696678897]
+position = Vector2(22, 0)
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="corpo/HitboxSoco" unique_id=603233003]
+shape = SubResource("RectangleShape2D_u7u5a")
+
+[node name="cabeca" type="CharacterBody2D" parent="." unique_id=1831272695]
+position = Vector2(0, -18)
+collision_layer = 4
+script = ExtResource("3_82hnu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="cabeca" unique_id=1126340529]
+position = Vector2(0, -2)
+shape = SubResource("CircleShape2D_pxkc7")
+disabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="cabeca" unique_id=712486977]
+
+[node name="area_dano" type="Area2D" parent="cabeca" unique_id=100761568]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="cabeca/area_dano" unique_id=949296903]
+position = Vector2(0, -2)
+shape = SubResource("CircleShape2D_0raev")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1447202046]
+position = Vector2(0, -5)
+shape = SubResource("CapsuleShape2D_f8ao0")
+
+[connection signal="body_entered" from="corpo/area_dano" to="corpo" method="_on_area_dano_body_entered"]
+[connection signal="body_entered" from="cabeca/area_dano" to="cabeca" method="_on_area_dano_body_entered"]
