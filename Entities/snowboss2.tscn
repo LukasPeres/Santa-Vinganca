@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://d3p27v5k6regm" path="res://Scripts/snowboss_2.gd" id="1_1bah1"]
 [ext_resource type="Script" uid="uid://7sm0sie80j5i" path="res://Scripts/corpo.gd" id="1_olyxe"]
 [ext_resource type="Texture2D" uid="uid://b4mojgwvjwf85" path="res://Sprites/Personagens/Boneco_neve/boneco de neve.png" id="2_1bah1"]
+[ext_resource type="PackedScene" uid="uid://d0ab2sewpd5fa" path="res://Entities/snowball_arc.tscn" id="2_82hnu"]
 [ext_resource type="Script" uid="uid://c60h88s2piyoq" path="res://Scripts/cabeca.gd" id="3_82hnu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sakgq"]
@@ -20,6 +21,7 @@
 [node name="snowboss" type="CharacterBody2D" unique_id=1505547716]
 collision_layer = 2
 script = ExtResource("1_1bah1")
+bola_neve_scene = ExtResource("2_82hnu")
 
 [node name="corpo" type="CharacterBody2D" parent="." unique_id=1889616616]
 collision_layer = 4
@@ -48,14 +50,15 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_u1tvg")
 
 [node name="PontoImpacto" type="Marker2D" parent="corpo" unique_id=2100955329]
-position = Vector2(22, 9)
+position = Vector2(22, 0)
 
 [node name="HitboxSoco" type="Area2D" parent="corpo" unique_id=1696678897]
 position = Vector2(22, 0)
-monitoring = false
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="corpo/HitboxSoco" unique_id=603233003]
 shape = SubResource("RectangleShape2D_u7u5a")
+disabled = true
 
 [node name="cabeca" type="CharacterBody2D" parent="." unique_id=1831272695]
 position = Vector2(0, -18)
@@ -82,4 +85,5 @@ position = Vector2(0, -5)
 shape = SubResource("CapsuleShape2D_f8ao0")
 
 [connection signal="body_entered" from="corpo/area_dano" to="corpo" method="_on_area_dano_body_entered"]
+[connection signal="body_entered" from="corpo/HitboxSoco" to="corpo" method="_on_hitbox_soco_body_entered"]
 [connection signal="body_entered" from="cabeca/area_dano" to="cabeca" method="_on_area_dano_body_entered"]

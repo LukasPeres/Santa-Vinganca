@@ -1,7 +1,10 @@
 extends CharacterBody2D
+@export var bola_neve_scene : PackedScene # Arraste o snowball_arc.tscn aqui no Inspetor
+@export var raio_scene : PackedScene # Arraste o raio_boss.tscn aqui no Inspetor
 
 # --- CONFIGURAÇÕES ---
-
+const SPEED_DASH = 170.0 # Velocidade do deslize (bem maior que a perseguição)
+const DURACAO_DASH = 0.6 # Quanto tempo ele fica deslizando
 
 var timer_sorteio : float = 0.0 # Nova variável no topo do script
 var chance_de_ataque : float = 0.0
@@ -22,7 +25,7 @@ const SPEED_ATROPELAMENTO = 80.0
 
 # IA e Estados
 var player = null
-enum States { SEGUINDO, AFASTANDO_PARA_RAIO, EXECUTANDO_RAIO, MARTELADA, TRANSICAO }
+enum States { SEGUINDO, AFASTANDO_PARA_RAIO, EXECUTANDO_RAIO, DASH_MARTELADA, MARTELADA, TRANSICAO }
 var current_state = States.SEGUINDO
 
 func _ready():
@@ -34,7 +37,7 @@ func _ready():
 func _physics_process(delta):
 	# Trava de Fase 2
 	if health <= FASE2_THRESHOLD and current_state != States.TRANSICAO:
-		mudar_estado(States.TRANSICAO)
+		change_state(States.TRANSICAO)
 		return
 		
 	if current_state == States.TRANSICAO: return
@@ -52,14 +55,17 @@ func _physics_process(delta):
 			if randf() * 100.0 < chance_de_ataque:
 				decidir_qual_ataque()
 
-	# 2. LÓGICA DE MOVIMENTO
+# 2. LÓGICA DE MOVIMENTO
 	match current_state:
 		States.SEGUINDO:
 			perseguir_player(delta)
 		States.AFASTANDO_PARA_RAIO:
 			fugir_do_player()
+		States.DASH_MARTELADA:
+			# Mantém a velocidade que definimos no início do dash
+			velocity.x = direcao_atual * SPEED_DASH
 		States.EXECUTANDO_RAIO, States.MARTELADA:
-			velocity.x = 0 
+			velocity.x = 0
 
 	# 3. SINCRONIA VISUAL
 	if velocity.x != 0:
@@ -69,6 +75,35 @@ func _physics_process(delta):
 
 	apply_gravity(delta)
 	move_and_slide()
+
+func change_state(new_state):
+	# --- SAÍDA DO ESTADO ANTERIOR ---
+	match current_state:
+		States.SEGUINDO:
+			timer_sorteio = 0.0 # Reseta o tempo de sorteio ao parar de seguir
+			velocity.x = 0
+
+	# --- TROCA ---
+	current_state = new_state
+
+	# --- ENTRADA NO NOVO ESTADO (Onde você colocará as animações futuramente) ---
+	match current_state:
+		States.SEGUINDO:
+			print("ENTRANDO: Seguindo")
+			# aqui iria: animation_player.play("walk")
+		States.AFASTANDO_PARA_RAIO:
+			print("ENTRANDO: Fuga para Raio")
+		States.EXECUTANDO_RAIO:
+			velocity.x = 0
+			print("ENTRANDO: Disparo")
+		States.DASH_MARTELADA:
+			print("ENTRANDO: Dash Deslizante!")
+			# aqui iria: animation_player.play("dash_slide")
+		States.MARTELADA:
+			velocity.x = 0
+			print("ENTRANDO: Martelada")
+		States.TRANSICAO:
+			transicao_fase_2()
 
 # =========================================================
 # MOVIMENTAÇÃO
@@ -91,11 +126,6 @@ func fugir_do_player():
 		var direcao_fuga = sign(global_position.x - player.global_position.x)
 		velocity.x = direcao_fuga * SPEED_ATROPELAMENTO
 
-func mudar_estado(novo_estado):
-	current_state = novo_estado
-	if novo_estado == States.TRANSICAO:
-		transicao_fase_2()
-
 # =========================================================
 # COMBATE
 # =========================================================
@@ -111,30 +141,80 @@ func decidir_qual_ataque():
 		iniciar_sequencia_martelada()
 
 func iniciar_sequencia_martelada():
-	print("BOSS: MARTELADA!")
-	current_state = States.MARTELADA
-	# Aqui você pode chamar o spawn das bolas de neve futuramente
-	await get_tree().create_timer(0.8).timeout
-	current_state = States.SEGUINDO
+	change_state(States.DASH_MARTELADA)
+	
+	if player:
+		direcao_atual = sign(player.global_position.x - global_position.x)
+	
+	velocity.x = direcao_atual * SPEED_DASH
+	await get_tree().create_timer(DURACAO_DASH).timeout
+	
+	# --- MOMENTO DO IMPACTO ---
+	change_state(States.MARTELADA)
+	
+	if corpo.has_method("set_martelada_ativa"):
+		corpo.set_martelada_ativa(true) 
+	
+	# ADICIONE ESTA LINHA AQUI:
+	disparar_chuva_bolas()
+	
+	print("ATAQUE: POW! (Bolas disparadas)")
+	
+	await get_tree().create_timer(0.4).timeout 
+	
+	if corpo.has_method("set_martelada_ativa"):
+		corpo.set_martelada_ativa(false) 
+		
+	await get_tree().create_timer(0.4).timeout 
+	change_state(States.SEGUINDO)
+	
+func disparar_chuva_bolas():
+	if not bola_neve_scene: return
+	
+	var ponto = $corpo/PontoImpacto
+	var numero_de_bolas = 16 # Quantidade de bolas na chuva
+	
+	# Sorteia o início do Spot Safe (evitando as pontas extremas)
+	# O buraco terá 2 bolas de largura para ser um "safe spot" real
+	var spot_safe_inicio = randi_range(2, 7) 
+	
+	print("BOSS: Chuva vertical! Spot Safe no índice: ", spot_safe_inicio)
+	
+	for i in range(numero_de_bolas):
+		# Cria o buraco removendo duas bolas vizinhas
+		if i == spot_safe_inicio or i == spot_safe_inicio + 1:
+			continue
+			
+		var bola = bola_neve_scene.instantiate()
+		get_parent().add_child(bola)
+		bola.global_position = ponto.global_position
+		bola.z_index = 10
+		
+		# --- CÁLCULO PARA ARCO VOLTADO PARA CIMA ---
+		# fracao vai de 0.0 a 1.0
+		var fracao = float(i) / float(numero_de_bolas - 1)
+		
+		# Ajuste de Direção Horizontal (-1.0 esquerda, 1.0 direita)
+		# Diminuímos o multiplicador (ex: 300) para o arco não abrir 180 graus
+		var direcao_horizontal = lerp(-1.0, 1.0, fracao)
+		var forca_x = direcao_horizontal * 350.0 # Valor menor = arco mais fechado
+		
+		# Ajuste de Força Vertical (Sempre para cima)
+		# Aumentamos a base (-600) para elas subirem bem alto antes de cair
+		var forca_y = -450.0 - (randf() * 150.0) 
+		
+		if "velocity" in bola:
+			bola.velocity = Vector2(forca_x, forca_y)
 
 func iniciar_sequencia_raio():
-	print("BOSS: Preparando Raio (Fugindo...)")
-	current_state = States.AFASTANDO_PARA_RAIO
-	
-	# Espera o tempo de fuga (1.5s)
+	change_state(States.AFASTANDO_PARA_RAIO)
 	await get_tree().create_timer(1.5).timeout
-	
-	# --- AJUSTE AQUI: Vira para o player antes de atirar ---
 	if player:
 		var direcao_para_player = sign(player.global_position.x - global_position.x)
-		if corpo.has_method("atualizar_direcao"):
-			corpo.atualizar_direcao(direcao_para_player)
-	
-	current_state = States.EXECUTANDO_RAIO
-	print("ATAQUE: Disparando Raio! (Agora olhando para o Player)")
-	
+		corpo.atualizar_direcao(direcao_para_player)
+	change_state(States.EXECUTANDO_RAIO)
 	await get_tree().create_timer(1.0).timeout
-	current_state = States.SEGUINDO
+	change_state(States.SEGUINDO)
 
 # =========================================================
 # SISTEMA

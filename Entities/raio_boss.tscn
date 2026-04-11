@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cqxavc3uhcs0p"]
+
+[ext_resource type="Script" uid="uid://ldxs12f2s6cp" path="res://Scripts/raio_boss.gd" id="1_vptim"]
+
+[node name="raio_boss" type="Node2D" unique_id=278856288]
+script = ExtResource("1_vptim")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=676380052]
+
+[node name="Line2D" type="Line2D" parent="." unique_id=420355138]
+
+[node name="Timer" type="Timer" parent="." unique_id=918293592]

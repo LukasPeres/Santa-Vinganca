@@ -1,8 +1,25 @@
 [gd_scene format=3 uid="uid://d0ab2sewpd5fa"]
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_t4ly4"]
+[ext_resource type="Script" uid="uid://rbmcx1pb3cru" path="res://Scripts/snowball_arc.gd" id="1_0b25x"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0b25x"]
+radius = 4.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_n7hk1"]
+radius = 4.0
 
 [node name="snowball_arc" type="CharacterBody2D" unique_id=774603723]
+collision_layer = 8
+script = ExtResource("1_0b25x")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1336934098]
-shape = SubResource("SegmentShape2D_t4ly4")
+shape = SubResource("CircleShape2D_0b25x")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=174461041]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=574936166]
+shape = SubResource("CircleShape2D_n7hk1")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

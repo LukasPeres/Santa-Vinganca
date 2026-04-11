@@ -11,6 +11,26 @@ func _physics_process(_delta):
 	if get_parent().name != "snowboss": # Se não for mais filho do snowboss
 		move_and_slide()
 
+
+
+
+# combate
+# Função para o Snowboss ligar/desligar o perigo da martelada
+func set_martelada_ativa(valor: bool):
+	if has_node("HitboxSoco/CollisionShape2D"):
+		$HitboxSoco/CollisionShape2D.disabled = !valor
+		# Se quiser testar visualmente se está funcionando:
+		$HitboxSoco.visible = valor 
+
+func _on_hitbox_soco_body_entered(body):
+	if body.is_in_group("player"):
+		# Verifica se o método take_damage existe no player e aplica o dano
+		if body.has_method("take_damage"):
+			body.take_damage(2, global_position)
+			print("PLAYER TOMOU MARTELADA!")
+
+
+#Sistema
 func atualizar_direcao(dir):
 	if sprite:
 		sprite.flip_h = (dir == -1)
