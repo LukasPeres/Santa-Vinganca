@@ -1,71 +1,131 @@
 extends CharacterBody2D
 
-@onready var sprite = $Sprite2D
+# 1. ATUALIZADO: Agora aponta para o AnimatedSprite2D
+@onready var sprite = $AnimatedSprite2D 
+@onready var col_ar = $HitboxSoco/CollisionShape2D
+@onready var col_chao = $HitboxSoco/CollisionShape2D2
 
 func _ready():
 	add_to_group("enemy")
 
 func _physics_process(_delta):
-	# Na Fase 1, ele não executa física própria, apenas segue o pai.
-	# Na Fase 2, move_and_slide será chamado aqui.
-	if get_parent().name != "snowboss": # Se não for mais filho do snowboss
+	if get_parent().name != "snowboss": 
 		move_and_slide()
 
+# --- COMBATE ---
 
-
-
-# combate
-# Função para o Snowboss ligar/desligar o perigo da martelada
+# Função que o Boss chama ao entrar no estado de Martelo
 func set_martelada_ativa(valor: bool):
-	if has_node("HitboxSoco/CollisionShape2D"):
-		$HitboxSoco/CollisionShape2D.disabled = !valor
-		# Se quiser testar visualmente se está funcionando:
-		$HitboxSoco.visible = valor 
+	$HitboxSoco.visible = valor
+	if not valor:
+		desativar_todas_colisoes_soco()
+		sprite.offset.y = 0
 
-func _on_hitbox_soco_body_entered(body):
-	if body.is_in_group("player"):
-		# Verifica se o método take_damage existe no player e aplica o dano
-		if body.has_method("take_damage"):
-			body.take_damage(2, global_position)
-			print("PLAYER TOMOU MARTELADA!")
+# Essa função roda TODA VEZ que o frame da animação muda
+func _on_animated_sprite_2d_frame_changed():
+	if sprite.animation == "martelada":
+		# AJUSTE DE ALTURA (Mude o -15 para o valor que encaixar no seu chão)
+		sprite.offset.y = -13
+		
 
+		
+		# CONTROLE DE HITBOX (Ativando por frames)
+		match sprite.frame:
+			0, 1, 2: # Preparação
+				desativar_todas_colisoes_soco()
+			3: # FRAME DO SLASH (Corte no ar)
+				col_ar.disabled = false
+				col_chao.disabled = false
+				# 1. TREMOR DE TELA
+				aplicar_tremor(10.0, 0.25)
+				
+				# 2. CHUVA DE BOLAS (Agora acontece junto com o impacto!)
+				if get_parent().has_method("disparar_chuva_bolas"):
+					get_parent().disparar_chuva_bolas()
+				
+				print("DEBUG CORPO: IMPACTO TOTAL (Shake + Neve)!")
+				#aplicar_tremor(10.0, 0.25)
+			4: # FRAME DO IMPACTO (Martelo no chão)
+				col_ar.disabled = false    
+				col_chao.disabled = false
+			
+			5: # Fim / Recuperação
 
-#Sistema
-func atualizar_direcao(dir):
-	if sprite:
-		sprite.flip_h = (dir == -1)
+				desativar_todas_colisoes_soco()
+				
+	elif sprite.animation == "andando":
+		# O andando precisa subir SÓ UM POUCO (ex: -4)
+		# Ajuste esse número até os pés tocarem a linha do chão
+		sprite.offset.y = -1
+		
+	else:
+		# Idle ou outras animações (ajuste conforme necessário)
+		sprite.offset.y = 0
+
+# Função auxiliar para limpar as colisões
+func desativar_todas_colisoes_soco():
+	if col_ar: col_ar.disabled = true
+	if col_chao: col_chao.disabled = true
 	
-	# 1. Inverte o RemoteTransform (Pescoço/Cabeça)
+# --- SISTEMA ---
+func atualizar_direcao(dir):
+	# Note: Removi o sprite.flip_h daqui. 
+	# Vamos fazer o Boss principal girar o sprite, 
+	# e o corpo gira o resto abaixo:
+	
 	if has_node("RemoteTransform2D"):
 		$RemoteTransform2D.position.x = abs($RemoteTransform2D.position.x) * dir
 		
-	# 2. Inverte o HitboxSoco (A área da Martelada)
 	if has_node("HitboxSoco"):
 		$HitboxSoco.position.x = abs($HitboxSoco.position.x) * dir
-		# Opcional: Se o Hitbox tiver um CollisionShape não centralizado, 
-		# ele acompanhará a posição do pai HitboxSoco.
 		
-	# 3. Inverte o PontoImpacto (Onde nascem as bolas de neve)
 	if has_node("PontoImpacto"):
 		$PontoImpacto.position.x = abs($PontoImpacto.position.x) * dir
 		
-		
 func flash_damage():
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color(10, 10, 10), 0.05)
-	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
+	# 2. ATUALIZADO: O Tween agora usa o AnimatedSprite2D
+	if sprite:
+		var tween = create_tween()
+		tween.tween_property(sprite, "modulate", Color(10, 10, 10), 0.05)
+		tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
 
 func take_damage(amount, _from_pos = Vector2.ZERO, _is_projectile = false):
-	flash_damage() # O corpo pisca para dar feedback visual
-	
-	# Se ainda for Fase 1 (filho do snowboss), repassa o dano para o HP global
+	flash_damage()
 	if get_parent().has_method("take_damage"):
 		get_parent().take_damage(amount) 
-	else:
-		# Lógica de vida própria da Fase 2 (quando o pai já morreu)
-		# health -= amount...
-		pass
+
+func _on_hitbox_soco_body_entered(body):
+	if body.is_in_group("player"):
+		if body.has_method("take_damage"):
+			# Dano do martelo/soco é maior que o de contato
+			body.take_damage(2, global_position)
+			print("BOSS: Player atingido pelo MARTELO!")
 
 func _on_area_dano_body_entered(body):
 	if body.is_in_group("player"):
-		body.take_damage(1, global_position)
+		if body.has_method("take_damage"):
+			# Dano de contato normal é 1
+			body.take_damage(1, global_position)
+			print("BOSS: Player encostou no corpo!")
+
+
+func _on_animated_sprite_2d_animation_finished():
+	if sprite.animation == "martelada":
+		# Apenas encerra o estado para o Boss voltar a andar
+		set_martelada_ativa(false)
+		if get_parent().has_method("go_to_seguindo_state"):
+			get_parent().go_to_seguindo_state()
+			
+func aplicar_tremor(intensidade: float, duracao: float):
+	var cam = get_viewport().get_camera_2d()
+	if cam:
+		var original_offset = cam.offset
+		var tween = create_tween()
+		
+		# Faz a câmera vibrar rapidamente
+		for i in range(5):
+			var move_para = Vector2(randf_range(-intensidade, intensidade), randf_range(-intensidade, intensidade))
+			tween.tween_property(cam, "offset", move_para, duracao / 5)
+		
+		# Garante que a câmera volte ao normal (0,0)
+		tween.tween_property(cam, "offset", original_offset, 0.05)

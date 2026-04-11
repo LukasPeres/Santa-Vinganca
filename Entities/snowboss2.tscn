@@ -3,14 +3,194 @@
 [ext_resource type="Script" uid="uid://d3p27v5k6regm" path="res://Scripts/snowboss_2.gd" id="1_1bah1"]
 [ext_resource type="Script" uid="uid://7sm0sie80j5i" path="res://Scripts/corpo.gd" id="1_olyxe"]
 [ext_resource type="Texture2D" uid="uid://b4mojgwvjwf85" path="res://Sprites/Personagens/Boneco_neve/boneco de neve.png" id="2_1bah1"]
-[ext_resource type="PackedScene" uid="uid://d0ab2sewpd5fa" path="res://Entities/snowball_arc.tscn" id="2_82hnu"]
 [ext_resource type="Script" uid="uid://c60h88s2piyoq" path="res://Scripts/cabeca.gd" id="3_82hnu"]
+[ext_resource type="Texture2D" uid="uid://bmfqp3oulvakg" path="res://Sprites/Personagens/Boneco_neve/boneco-de-neve-andando.png" id="3_lg7jg"]
+[ext_resource type="Texture2D" uid="uid://myf08c25gtj7" path="res://Sprites/Personagens/Boneco_neve/boneco-de-neve-porradando.png" id="5_ddfrk"]
+[ext_resource type="Texture2D" uid="uid://btag5g7ce18dy" path="res://Sprites/Personagens/Boneco_neve/boneco-de-neve-raio.png" id="6_4vl65"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sakgq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u1tvg"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_u7u5a"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lg7jg"]
+size = Vector2(45.32628, 33.30629)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ddfrk"]
+radius = 17.48287
+height = 84.35231
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tfv86"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(0, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gaqyq"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(68, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dres0"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(136, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c586c"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(204, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2s25y"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(272, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_34xof"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(340, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_71441"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(408, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_udeat"]
+atlas = ExtResource("3_lg7jg")
+region = Rect2(476, 0, 68, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lg7jg"]
+atlas = ExtResource("5_ddfrk")
+region = Rect2(0, 0, 131, 91)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ddfrk"]
+atlas = ExtResource("5_ddfrk")
+region = Rect2(131, 0, 131, 91)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4vl65"]
+atlas = ExtResource("5_ddfrk")
+region = Rect2(262, 0, 131, 91)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h75uv"]
+atlas = ExtResource("5_ddfrk")
+region = Rect2(393, 0, 131, 91)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f5hyk"]
+atlas = ExtResource("5_ddfrk")
+region = Rect2(524, 0, 131, 91)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ka2er"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(0, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6hs2d"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(66, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4jg18"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(132, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgko5"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(198, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fd65b"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(264, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i685f"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(330, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ce2qq"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(396, 0, 66, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cf21t"]
+atlas = ExtResource("6_4vl65")
+region = Rect2(462, 0, 66, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1bah1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tfv86")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gaqyq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dres0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c586c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2s25y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_34xof")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_71441")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_udeat")
+}],
+"loop": true,
+"name": &"andando",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_1bah1")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lg7jg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ddfrk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4vl65")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h75uv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f5hyk")
+}],
+"loop": false,
+"name": &"martelada",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ka2er")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6hs2d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4jg18")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dgko5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fd65b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i685f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ce2qq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cf21t")
+}],
+"loop": false,
+"name": &"soltando_raio",
+"speed": 5.0
+}]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pxkc7"]
 
@@ -21,7 +201,6 @@
 [node name="snowboss" type="CharacterBody2D" unique_id=1505547716]
 collision_layer = 2
 script = ExtResource("1_1bah1")
-bola_neve_scene = ExtResource("2_82hnu")
 
 [node name="corpo" type="CharacterBody2D" parent="." unique_id=1889616616]
 collision_layer = 4
@@ -31,16 +210,9 @@ script = ExtResource("1_olyxe")
 shape = SubResource("RectangleShape2D_sakgq")
 disabled = true
 
-[node name="Sprite2D" type="Sprite2D" parent="corpo" unique_id=1200579789]
-position = Vector2(2, -19.000002)
-scale = Vector2(0.9, 0.9)
-texture = ExtResource("2_1bah1")
-
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="corpo" unique_id=614747861]
 position = Vector2(0, -18)
 remote_path = NodePath("../../cabeca")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="corpo" unique_id=1962789860]
 
 [node name="area_dano" type="Area2D" parent="corpo" unique_id=1267115924]
 collision_layer = 0
@@ -50,15 +222,32 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_u1tvg")
 
 [node name="PontoImpacto" type="Marker2D" parent="corpo" unique_id=2100955329]
-position = Vector2(22, 0)
+position = Vector2(38, 0)
 
 [node name="HitboxSoco" type="Area2D" parent="corpo" unique_id=1696678897]
 position = Vector2(22, 0)
 collision_mask = 3
+metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="corpo/HitboxSoco" unique_id=603233003]
-shape = SubResource("RectangleShape2D_u7u5a")
+position = Vector2(16.36621, 3.596877)
+rotation = 0.30717793
+shape = SubResource("RectangleShape2D_lg7jg")
 disabled = true
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="corpo/HitboxSoco" unique_id=1391232331]
+position = Vector2(1, -35)
+rotation = 2.1450098
+shape = SubResource("CapsuleShape2D_ddfrk")
+disabled = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="corpo" unique_id=743369448]
+position = Vector2(5, -22)
+sprite_frames = SubResource("SpriteFrames_1bah1")
+animation = &"martelada"
+autoplay = "idle"
+metadata/_edit_lock_ = true
 
 [node name="cabeca" type="CharacterBody2D" parent="." unique_id=1831272695]
 position = Vector2(0, -18)
@@ -86,4 +275,6 @@ shape = SubResource("CapsuleShape2D_f8ao0")
 
 [connection signal="body_entered" from="corpo/area_dano" to="corpo" method="_on_area_dano_body_entered"]
 [connection signal="body_entered" from="corpo/HitboxSoco" to="corpo" method="_on_hitbox_soco_body_entered"]
+[connection signal="animation_finished" from="corpo/AnimatedSprite2D" to="corpo" method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="frame_changed" from="corpo/AnimatedSprite2D" to="corpo" method="_on_animated_sprite_2d_frame_changed"]
 [connection signal="body_entered" from="cabeca/area_dano" to="cabeca" method="_on_area_dano_body_entered"]
