@@ -9,8 +9,11 @@
 [ext_resource type="Texture2D" uid="uid://btag5g7ce18dy" path="res://Sprites/Personagens/Boneco_neve/boneco-de-neve-raio.png" id="6_4vl65"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sakgq"]
+size = Vector2(26, 36)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_u1tvg"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lg7jg"]
+radius = 13.0
+height = 52.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lg7jg"]
 size = Vector2(45.32628, 33.30629)
@@ -197,6 +200,8 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_0raev"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_f8ao0"]
+radius = 14.0
+height = 50.0
 
 [node name="snowboss" type="CharacterBody2D" unique_id=1505547716]
 collision_layer = 2
@@ -207,8 +212,9 @@ collision_layer = 4
 script = ExtResource("1_olyxe")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="corpo" unique_id=158761331]
+position = Vector2(-1, -8)
 shape = SubResource("RectangleShape2D_sakgq")
-disabled = true
+metadata/_edit_lock_ = true
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="corpo" unique_id=614747861]
 position = Vector2(0, -18)
@@ -217,12 +223,16 @@ remote_path = NodePath("../../cabeca")
 [node name="area_dano" type="Area2D" parent="corpo" unique_id=1267115924]
 collision_layer = 0
 collision_mask = 2
+metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="corpo/area_dano" unique_id=989050587]
-shape = SubResource("RectangleShape2D_u1tvg")
+position = Vector2(0, -14)
+shape = SubResource("CapsuleShape2D_lg7jg")
+metadata/_edit_lock_ = true
 
 [node name="PontoImpacto" type="Marker2D" parent="corpo" unique_id=2100955329]
 position = Vector2(38, 0)
+metadata/_edit_lock_ = true
 
 [node name="HitboxSoco" type="Area2D" parent="corpo" unique_id=1696678897]
 position = Vector2(22, 0)
@@ -241,12 +251,14 @@ position = Vector2(1, -35)
 rotation = 2.1450098
 shape = SubResource("CapsuleShape2D_ddfrk")
 disabled = true
+metadata/_edit_lock_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="corpo" unique_id=743369448]
 position = Vector2(5, -22)
 sprite_frames = SubResource("SpriteFrames_1bah1")
 animation = &"soltando_raio"
 autoplay = "idle"
+metadata/_edit_lock_ = true
 
 [node name="PontoRaio" type="Marker2D" parent="corpo" unique_id=1452407888]
 position = Vector2(25, -32)
@@ -268,13 +280,12 @@ collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="cabeca/area_dano" unique_id=949296903]
-position = Vector2(0, -2)
+position = Vector2(5, -13)
 shape = SubResource("CircleShape2D_0raev")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1447202046]
-position = Vector2(0, -5)
+position = Vector2(1, -15)
 shape = SubResource("CapsuleShape2D_f8ao0")
-metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="corpo/area_dano" to="corpo" method="_on_area_dano_body_entered"]
 [connection signal="body_entered" from="corpo/HitboxSoco" to="corpo" method="_on_hitbox_soco_body_entered"]

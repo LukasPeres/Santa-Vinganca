@@ -8,8 +8,11 @@ enum BossState {
 	RAIO,
 	DASH,
 	MARTELO,
-	TRANSICAO
+	TRANSICAO,
+	FASE2
 }
+
+var fase_2_ativa: bool = false
 
 # --- REFERÊNCIAS ---
 @onready var corpo = $corpo
@@ -220,7 +223,23 @@ func go_to_martelo_state():
 func go_to_transicao_state():
 	status_atual = BossState.TRANSICAO
 	velocity.x = 0
-	print("BOSS: Vida baixa, parando para Fase 2")
+	anim.play("idle") # Ou uma animação de "dor"
+	
+	print("BOSS: Iniciando Transição para Fase 2...")
+	
+	# Pequeno delay para o impacto visual
+	await get_tree().create_timer(2.0).timeout
+	iniciar_fase_2()
+
+func iniciar_fase_2():
+	fase_2_ativa = true
+	status_atual = BossState.FASE2
+	
+	# 1. Se a cabeça for um nó filho, podemos soltá-la ou apenas mudar o script dela
+	if cabeca.has_method("ativar_modo_quicar"):
+		cabeca.ativar_modo_quicar()
+	
+	print("BOSS: FASE 2 INICIADA!")
 
 # =========================================================
 # COMBATE

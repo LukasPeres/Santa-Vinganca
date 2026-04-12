@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://hvh3ntegm5t6"]
 
 [ext_resource type="Script" uid="uid://b3tgrhgpfl28a" path="res://Scripts/player.gd" id="1_tcnsb"]
-[ext_resource type="Texture2D" uid="uid://b7qx7heaiiufr" path="res://Sprites/Concepts/Papanel/sprite_idle_default.png" id="2_gb1tc"]
 [ext_resource type="Texture2D" uid="uid://dvwibl470mnb1" path="res://Sprites/Concepts/Papanel/ataque_melee_funcionando-Sheet.png" id="2_xd3k7"]
+[ext_resource type="Texture2D" uid="uid://byfria3xqvl5y" path="res://Sprites/Personagens/Papanel/Papanel.png" id="3_xd3k7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
-size = Vector2(20, 30)
+size = Vector2(19, 45)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_taegk"]
 atlas = ExtResource("2_xd3k7")
@@ -37,7 +37,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_gb1tc")
+"texture": ExtResource("3_xd3k7")
 }],
 "loop": true,
 "name": &"Idle",
@@ -52,9 +52,12 @@ floor_constant_speed = true
 script = ExtResource("1_tcnsb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=37613180]
+position = Vector2(1.5, -15.5)
 shape = SubResource("RectangleShape2D_taegk")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=818598190]
+position = Vector2(0, -17)
+scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
 animation = &"Idle"
 autoplay = "Idle"
@@ -64,7 +67,7 @@ collision_layer = 15
 collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=307324714]
-position = Vector2(20, 1)
+position = Vector2(21, -4)
 shape = SubResource("RectangleShape2D_xd3k7")
 debug_color = Color(0.5126275, 0.54585844, 0.5256797, 0.41960785)
 
