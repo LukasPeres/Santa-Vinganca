@@ -1,60 +1,52 @@
-extends Node2D
+extends Area2D
 
-@onready var raycast = $RayCast2D
-@onready var line = $Line2D
+@export var dano: int = 1
+@export var comprimento_maximo: float = 2000.0
 
-var comprimento_maximo = 1000.0 # O quão longe o raio chega
-var esta_ativo = false
+@onready var sprite_inicio = $Sprite_Inicio
+@onready var sprite_meio = $Sprite_Meio
+@onready var colisao = $CollisionShape2D
+
+var e_apenas_aviso: bool = false
 
 func _ready():
-	# 1. Configuração inicial: O raio começa "encolhido"
-	line.points[1] = Vector2.ZERO 
-	raycast.target_position = Vector2.ZERO
-	
-	# === O SEU AWAIT DE AVISO ===
-	# Aqui o player vê o Boss preparando, mas nada acontece ainda
-	await get_tree().create_timer(1.0).timeout 
-	
-	# 2. DISPARAR O RAIO
-	ativar_raio()
+	# Timer para o raio sumir
+	get_tree().create_timer(0.67).timeout.connect(func(): queue_free())
 
-func _physics_process(delta):
-	if esta_ativo:
-		# Fazemos o raio "crescer" ou se manter esticado até a parede
-		atualizar_raio()
+func configurar_como_aviso(direcao_x: float):
+	e_apenas_aviso = true
+	scale.x = direcao_x
+	if colisao: colisao.disabled = true
+	
+	modulate = Color(1, 0, 0, 0.4) 
+	scale.y = 0.1 
+	
+	# Aumente esse tempo se o aviso sumir antes do raio aparecer!
+	# Experimente 0.4 ou 0.5 se a animação for lenta.
+	get_tree().create_timer(0.4).timeout.connect(func(): queue_free())
+	
 
-func ativar_raio():
-	esta_ativo = true
-	# Define a direção (ex: para a direita)
-	# Você pode passar a direção do Boss para cá depois
-	var direcao = Vector2(comprimento_maximo, 0) 
-	raycast.target_position = direcao
+func configurar_raio(direcao_x: float):
+	e_apenas_aviso = false
+	scale.x = direcao_x
 	
-	# O Timer de quanto tempo o raio fica na tela
-	await get_tree().create_timer(0.5).timeout
-	queue_free()
-
-func atualizar_raio():
-	# Forçamos o RayCast a atualizar a colisão agora
-	raycast.force_raycast_update()
+	# GARANTE QUE O REAL DÁ DANO
+	if colisao: 
+		colisao.disabled = false
+		var largura = colisao.shape.size.x
+		colisao.position.x = largura / 2
 	
-	var ponto_final = raycast.target_position
+	# Efeito de "Flash" branco ao disparar
+	modulate = Color(2, 2, 2, 1) # Brilho intenso
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.2)
 	
-	if raycast.is_colliding():
-		# Se bater em algo (parede ou player), o ponto final é onde bateu
-		# transformamos a posição global de batida em posição local para o Line2D
-		ponto_final = to_local(raycast.get_collision_point())
-		
-		# CHECAGEM DE DANO
-		var objeto = raycast.get_collider()
-		if objeto.is_in_group("player"):
-			dar_dano_no_player(objeto)
-	
-	# Estica o desenho do Line2D até o ponto de impacto
-	line.points[1] = ponto_final
-
-func dar_dano_no_player(player_node):
-	if player_node.has_method("take_damage"):
-		player_node.take_damage(1)
-		# Dica: adicione um pequeno timer aqui para o raio não dar 
-		# dano em todos os frames (60 vezes por segundo)
+# --- FUNÇÃO DE DANO ---
+func _on_body_entered(body: Node2D) -> void:
+	# 1. Verifica se o que entrou é o Player
+	if body.is_in_group("player"):
+		# 2. Verifica se o Player tem a função de tomar dano
+		if body.has_method("take_damage"):
+			# Envia o valor do dano e a posição do raio para o Knockback
+			body.take_damage(dano, global_position)
+			print("RAIO: Player atingido!")

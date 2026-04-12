@@ -23,6 +23,9 @@ func set_martelada_ativa(valor: bool):
 
 # Essa função roda TODA VEZ que o frame da animação muda
 func _on_animated_sprite_2d_frame_changed():
+	#para resolver problemas com nil
+	if not sprite: 
+		return
 	if sprite.animation == "martelada":
 		# AJUSTE DE ALTURA (Mude o -15 para o valor que encaixar no seu chão)
 		sprite.offset.y = -13
@@ -52,7 +55,17 @@ func _on_animated_sprite_2d_frame_changed():
 			5: # Fim / Recuperação
 
 				desativar_todas_colisoes_soco()
-				
+	
+	# Dentro do _on_animated_sprite_2d_frame_changed() no corpo.gd
+	elif sprite.animation == "soltando_raio":
+		match sprite.frame:
+			1, 2, 3:
+				if get_parent().has_method("mostrar_aviso_raio"):
+					get_parent().mostrar_aviso_raio()
+			4:
+				if get_parent().has_method("disparar_raio"):
+					get_parent().disparar_raio()
+	
 	elif sprite.animation == "andando":
 		# O andando precisa subir SÓ UM POUCO (ex: -4)
 		# Ajuste esse número até os pés tocarem a linha do chão
@@ -81,6 +94,12 @@ func atualizar_direcao(dir):
 		
 	if has_node("PontoImpacto"):
 		$PontoImpacto.position.x = abs($PontoImpacto.position.x) * dir
+	
+	if has_node("PontoRaio"):
+		if dir > 0: # Olhando para a DIREITA
+			$PontoRaio.position.x = 35 # O valor que você anotou
+		else: # Olhando para a ESQUERDA
+			$PontoRaio.position.x = -25 # O mesmo valor, mas negativo
 		
 func flash_damage():
 	# 2. ATUALIZADO: O Tween agora usa o AnimatedSprite2D

@@ -16,6 +16,7 @@ enum BossState {
 @onready var cabeca = $cabeca
 @onready var anim: AnimatedSprite2D = $corpo/AnimatedSprite2D
 
+const RAIO_SCN = preload("res://Entities/raio_boss.tscn")
 const SNOWBALL_SCN = preload("res://Entities/snowball_arc.tscn")
 
 var ultimo_ataque: String = ""
@@ -181,7 +182,7 @@ func go_to_fugindo_state():
 func go_to_raio_state():
 	status_atual = BossState.RAIO
 	anim.play("soltando_raio")
-	timer_estado = 2.0 # O raio dura 2 segundos
+	timer_estado = 2.5 # O raio dura 2 segundos
 	
 	# Vira para o player no início do golpe
 	if player:
@@ -319,6 +320,21 @@ func disparar_chuva_bolas():
 
 	print("DEBUG BOSS: Ciclo de geração concluído!")
 
+func disparar_raio():
+	var raio = RAIO_SCN.instantiate()
+	
+	# Adicionamos ao PAI (Cenário) para o raio ser independente do movimento do Boss
+	get_parent().add_child(raio)
+	
+	# Posicionamos no marcador da boca
+	raio.global_position = $corpo/PontoRaio.global_position
+	
+	# Pegamos a direção BASEADA NO FLIP do sprite do Boss
+	var direcao_final = -1.0 if anim.flip_h else 1.0
+	
+	# Passamos para o raio se configurar
+	if raio.has_method("configurar_raio"):
+		raio.configurar_raio(direcao_final)
 
 # =========================================================
 # SISTEMA
@@ -333,3 +349,13 @@ func take_damage(amount, _pos = Vector2.ZERO, _proj = false):
 	# Feedback visual de dano que mora no script do corpo
 	if corpo.has_method("flash_damage"):
 		corpo.flash_damage()
+
+func mostrar_aviso_raio():
+	var aviso = RAIO_SCN.instantiate()
+	get_parent().add_child(aviso)
+	
+	aviso.global_position = $corpo/PontoRaio.global_position
+	var dir = -1.0 if anim.flip_h else 1.0
+	
+	if aviso.has_method("configurar_como_aviso"):
+		aviso.configurar_como_aviso(dir)

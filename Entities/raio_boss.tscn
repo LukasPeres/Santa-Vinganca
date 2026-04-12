@@ -1,12 +1,33 @@
 [gd_scene format=3 uid="uid://cqxavc3uhcs0p"]
 
 [ext_resource type="Script" uid="uid://ldxs12f2s6cp" path="res://Scripts/raio_boss.gd" id="1_vptim"]
+[ext_resource type="Texture2D" uid="uid://cucorqjs7ggl6" path="res://Sprites/Personagens/Boneco_neve/raio-inicio.png" id="2_datks"]
+[ext_resource type="Texture2D" uid="uid://dw5vfkabwept0" path="res://Sprites/Personagens/Boneco_neve/raio-meio.png" id="3_7tl7k"]
 
-[node name="raio_boss" type="Node2D" unique_id=278856288]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vptim"]
+size = Vector2(593, 20)
+
+[node name="raio_boss" type="Area2D" unique_id=551139200]
+collision_mask = 2
 script = ExtResource("1_vptim")
 
-[node name="RayCast2D" type="RayCast2D" parent="." unique_id=676380052]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=892272099]
+position = Vector2(286.5, 0)
+shape = SubResource("RectangleShape2D_vptim")
+metadata/_edit_lock_ = true
 
-[node name="Line2D" type="Line2D" parent="." unique_id=420355138]
+[node name="Line2D" type="Line2D" parent="." unique_id=221610088]
 
-[node name="Timer" type="Timer" parent="." unique_id=918293592]
+[node name="Sprite_Inicio" type="Sprite2D" parent="." unique_id=782357434]
+position = Vector2(-10, -10)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_datks")
+centered = false
+
+[node name="Sprite_Meio" type="Sprite2D" parent="." unique_id=848606856]
+position = Vector2(21, -10)
+scale = Vector2(4.616803, 0.25)
+texture = ExtResource("3_7tl7k")
+centered = false
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
