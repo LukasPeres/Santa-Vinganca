@@ -1,5 +1,4 @@
 extends CharacterBody2D
-
 # Variáveis de controle do projétil
 var direction = 1
 const THROW_SPEED = 120
@@ -28,11 +27,13 @@ func _physics_process(delta):
 		var collision = get_slide_collision(i)
 		var body = collision.get_collider()
 
+# No loop de colisão da elf_bullet:
 		if body.is_in_group("enemy"):
-			# Se o objeto tiver a função de tomar dano, ele toma
 			if body.has_method("take_damage"):
-				body.take_damage(1, global_position)
-			queue_free() # Some ao acertar inimigo
+				# Mesmo que seja uma parábola, mandamos a direção horizontal dela
+				var dir_impacto = Vector2(direction, 0)
+				body.take_damage(1, global_position, dir_impacto)
+			queue_free()
 		else:
 			# Se bater no chão ou parede (qualquer coisa que não seja inimigo)
 			queue_free()

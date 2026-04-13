@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://b4riov538rlkj"]
+
+[ext_resource type="Script" uid="uid://dp5r48o5ek8v0" path="res://Scripts/cabeca_fase_2.gd" id="1_2ae61"]
+[ext_resource type="Texture2D" uid="uid://bjsk3x726m0yi" path="res://Sprites/Personagens/Boneco_neve/boneco-de-neve-cabeca.png" id="2_ogkij"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hlcpt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ogkij"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h7go0"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(0, 0, 26, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e0lsn"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(26, 0, 26, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2axi1"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(52, 0, 26, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ycxl"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(78, 0, 26, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8wgeu"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(104, 0, 26, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x6p03"]
+atlas = ExtResource("2_ogkij")
+region = Rect2(130, 0, 26, 42)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_h7go0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h7go0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e0lsn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2axi1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ycxl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8wgeu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x6p03")
+}],
+"loop": true,
+"name": &"girando",
+"speed": 5.0
+}]
+
+[node name="cabeca_fase2" type="CharacterBody2D" unique_id=832369995]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_2ae61")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1127945740]
+shape = SubResource("CircleShape2D_hlcpt")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=345128801]
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=624952173]
+shape = SubResource("CircleShape2D_ogkij")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=634995666]
+sprite_frames = SubResource("SpriteFrames_h7go0")
+animation = &"girando"
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

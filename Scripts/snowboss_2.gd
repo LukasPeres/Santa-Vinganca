@@ -9,9 +9,9 @@ enum BossState {
 	DASH,
 	MARTELO,
 	TRANSICAO,
-	FASE2
 }
-
+const CORPO_FASE2_SCN = preload("res://Entities/corpo_fase_2.tscn")
+const CABECA_FASE2_SCN = preload("res://Entities/cabeca_fase_2.tscn")
 var fase_2_ativa: bool = false
 
 # --- REFERÊNCIAS ---
@@ -48,7 +48,7 @@ const FASE2_THRESHOLD = 10.0
 
 # --- VARIÁVEIS DE CONTROLE ---
 var status_atual: BossState
-var health = 20.0
+var health = 30.0
 var player = null
 
 func _ready():
@@ -60,10 +60,6 @@ func _physics_process(delta):
 	# Se a vida chegar no limite, trava na transição
 	if health <= FASE2_THRESHOLD and status_atual != BossState.TRANSICAO:
 		go_to_transicao_state()
-		return
-	
-	if status_atual == BossState.TRANSICAO:
-		velocity.x = 0
 		return
 
 	apply_gravity(delta)
@@ -222,24 +218,55 @@ func go_to_martelo_state():
 
 func go_to_transicao_state():
 	status_atual = BossState.TRANSICAO
-	velocity.x = 0
-	anim.play("idle") # Ou uma animação de "dor"
+	velocity = Vector2.ZERO # Para o movimento imediatamente
 	
-	print("BOSS: Iniciando Transição para Fase 2...")
+	# 1. Feedback visual de que algo está mudando
+	anim.play("idle") # Ou uma animação de "dor" se tiver
+	# Um flash branco ou tremor no próprio Boss ajuda na maquiagem
+	var tween = create_tween()
+	tween.tween_property(corpo, "modulate", Color(10, 10, 10), 0.1)
+	tween.tween_property(corpo, "modulate", Color(1, 1, 1), 0.1)
 	
-	# Pequeno delay para o impacto visual
-	await get_tree().create_timer(2.0).timeout
-	iniciar_fase_2()
+	print("BOSS: Iniciando Transição...")
 
-func iniciar_fase_2():
-	fase_2_ativa = true
-	status_atual = BossState.FASE2
+	# 2. O tempo de drama (2 segundos antes de "explodir")
+	await get_tree().create_timer(2.0).timeout
 	
-	# 1. Se a cabeça for um nó filho, podemos soltá-la ou apenas mudar o script dela
-	if cabeca.has_method("ativar_modo_quicar"):
-		cabeca.ativar_modo_quicar()
+	# 3. Chama a função que faz a troca das peças
+	executar_spawn_fase_2()
+
+func executar_spawn_fase_2():
+	# Referências de posição baseadas nos Markers que você criou
+	# Usamos global_position para que as novas peças nasçam exatamente onde o corpo/cabeça estavam
+	var pos_corpo = $corpo/PontoCorpo.global_position
+	var pos_cabeca = $corpo/PontoCabeca.global_position
+	var direcao_atual = -1.0 if anim.flip_h else 1.0
 	
-	print("BOSS: FASE 2 INICIADA!")
+	# 4. Instanciar as cenas novas
+	var corpo_f2 = CORPO_FASE2_SCN.instantiate()
+	var cabeca_f2 = CABECA_FASE2_SCN.instantiate()
+	
+	# 5. Adicionar ao PAI do Boss (o cenário/level)
+	# IMPORTANTE: Adicionar ao pai garante que quando o SnowBoss der queue_free, eles continuem lá
+	get_parent().add_child(corpo_f2)
+	get_parent().add_child(cabeca_f2)
+	
+	# 6. Definir posições e direções iniciais
+	corpo_f2.global_position = pos_corpo
+	cabeca_f2.global_position = pos_cabeca
+	
+	# Se os seus novos inimigos tiverem uma função para setar o lado que olham:
+	if corpo_f2.has_method("configurar_inicio"):
+		corpo_f2.configurar_inicio(direcao_atual)
+	
+	# 7. A Maquiagem (Tremor e Partículas)
+	# Se você tiver um sistema de partículas de neve, dispare aqui na posição do Boss
+	
+	print("BOSS: Transformação completa. Removendo SnowBoss original.")
+	
+	# 8. O Boss original some para sempre
+	queue_free()
+
 
 # =========================================================
 # COMBATE

@@ -468,7 +468,13 @@ func shoot_elf():
 #hitbox do ataque, so funciona no grupo enemy
 func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("enemy"):
-		body.take_damage(1, global_position) #Alem do dano da knockback
+		# 1. Definimos a direção baseada no flip do sprite
+		var direcao_golpe = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
+		
+		# 2. Chamamos a função passando os TRÊS argumentos:
+		# amount (1), from_position (global_position), direcao_golpe (o vetor que criamos)
+		if body.has_method("take_damage"):
+			body.take_damage(1, global_position, direcao_golpe)
 
 #Ativa a hitbox do ataque, apenas no estado de ataque
 func _on_animated_sprite_2d_frame_changed() -> void:	
@@ -476,7 +482,7 @@ func _on_animated_sprite_2d_frame_changed() -> void:
 		return
 	
 	#Garante que no frame 1 do estado ataque, a hitbox de ataque seja ativada
-	if sprite.frame == 1:
+	if sprite.frame == 0 or 1 or 2:
 		hitbox.monitoring = true
 	else:
 		hitbox.monitoring = false

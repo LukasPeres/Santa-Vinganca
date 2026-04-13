@@ -263,6 +263,12 @@ metadata/_edit_lock_ = true
 [node name="PontoRaio" type="Marker2D" parent="corpo" unique_id=1452407888]
 position = Vector2(25, -32)
 
+[node name="PontoCorpo" type="Marker2D" parent="corpo" unique_id=1525324730]
+position = Vector2(0, -13)
+
+[node name="PontoCabeca" type="Marker2D" parent="corpo" unique_id=1435558960]
+position = Vector2(5, -32)
+
 [node name="cabeca" type="CharacterBody2D" parent="." unique_id=1831272695]
 position = Vector2(0, -18)
 collision_layer = 4
@@ -272,6 +278,7 @@ script = ExtResource("3_82hnu")
 position = Vector2(0, -2)
 shape = SubResource("CircleShape2D_pxkc7")
 disabled = true
+metadata/_edit_lock_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="cabeca" unique_id=712486977]
 
@@ -286,6 +293,7 @@ shape = SubResource("CircleShape2D_0raev")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1447202046]
 position = Vector2(1, -15)
 shape = SubResource("CapsuleShape2D_f8ao0")
+metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="corpo/area_dano" to="corpo" method="_on_area_dano_body_entered"]
 [connection signal="body_entered" from="corpo/HitboxSoco" to="corpo" method="_on_hitbox_soco_body_entered"]
