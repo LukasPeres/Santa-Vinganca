@@ -42,8 +42,8 @@ const MAX_SLIDE_SPEED = 200.0
 const SLIDE_JUMP_BOOST = 1.3
 
 # Mecânicas Especiais
-const DASH_SPEED = 400
-const DASH_TIME = 0.15
+const DASH_SPEED = 350
+const DASH_TIME = 0.2
 const ATTACK_COOLDOWN_MS = 400
 const MAX_DASHES = 1 # <--- Adicionado para o sistema de pulo
 const WALL_JUMP_VELOCITY = -250.0 # Força para cima
@@ -117,6 +117,10 @@ func update_state(_delta):
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	move() #Possibilita movimento nesse estado
 	
+	if not is_on_floor():
+		go_to_fall_state() # Ele começa a cair direto
+		return
+		
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -153,6 +157,11 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 		
 func walk_state():
 	move()
+	
+	# Se ele não está no chão e não está em outro estado (como dash)
+	if not is_on_floor():
+		go_to_fall_state() # Ele começa a cair direto
+		return
 	
 	#Dash
 	if wants_dash():
@@ -191,6 +200,13 @@ func walk_state():
 	
 func jump_state():
 	move()
+	
+	if is_on_wall() and not is_on_floor() and velocity.y > 0:
+		pass # Deixa o handle_wall_slide controlar o visual
+	
+	# Transição visual: Se começou a cair e a animação ainda é a de subida, muda!
+	if velocity.y > 0 and sprite.animation == "Pulo":
+		go_to_fall_state()
 	
 	# Permite pular de novo se bater em uma parede no ar
 	if wants_jump() and handle_wall_jump():
@@ -305,9 +321,22 @@ func go_to_jump_state():
 	status = PlayerState.jump
 	hitbox.monitoring = false
 	velocity.y = JUMP_VELOCITY
-	sprite.play("Idle")
 	coyote_timer = 0.0
-	
+	sprite.play("Pulo")
+
+func go_to_fall_state():
+	status = PlayerState.jump # Tecnicamente ele entra no estado de "ar"
+	sprite.play("Cair")
+	hitbox.monitoring = false
+	# Aqui você pode resetar o coyote_timer se quiser que ele 
+	# tenha aquele tempinho pra pular mesmo tendo caído da plataforma
+
+func go_to_wall_slide_state():
+	# O status continua jump para permitir pular da parede
+	sprite.play("Idle") 
+	# Você pode ajustar o offset aqui se ele estiver entrando na parede
+	sprite.offset.x = 0
+
 func go_to_attack_state():
 	status = PlayerState.attack
 	combo_stage = 1
@@ -345,10 +374,14 @@ func wants_jump():
 	return Input.is_action_just_pressed("jump")
 
 func wants_attack():
+	# Se estiver deslizando na parede, não pode atacar
+	if is_sliding_on_wall():
+		return false
+		
 	var current_time = Time.get_ticks_msec()
 	if Input.is_action_just_pressed("attack"):
 		if current_time - last_attack_timer >= ATTACK_COOLDOWN_MS:
-			last_attack_timer = current_time # Registra o momento do ataque
+			last_attack_timer = current_time
 			return true
 	return false
 
@@ -356,28 +389,34 @@ func wants_dash():
 	return Input.is_action_just_pressed("dash") and can_dash()
 
 func handle_wall_jump() -> bool:
-	# 1. Checa se está na parede e NO AR
 	if is_on_wall() and not is_on_floor():
-		var wall_normal = get_wall_normal() # Retorna a direção OPOSTA à parede	
-		# 2. Aplica o impulso (Normal.x empurra para longe da parede)
+		var wall_normal = get_wall_normal()
 		velocity.x = wall_normal.x * WALL_JUMP_PUSHBACK
 		velocity.y = WALL_JUMP_VELOCITY
-		# 2. LIGA A TRAVA: O player não vai conseguir mudar o X por 0.15s
 		wall_jump_timer = WALL_JUMP_LOCK_TIME
-		#Sprite inverte
 		sprite.flip_h = (wall_normal.x < 0)
-		#Depois do walljump, é possivel fazer outro dash
-		#dash_count = 0 
 		
-		return true # Wall jump aconteceu!
-	return false # Não estava na parede
+		# VISUAL: Força a animação de pulo ao pular da parede
+		go_to_jump_state() 
+		
+		return true
+	return false
 
 func handle_wall_slide(_delta):
-	# Só desliza se: estiver no ar, encostado na parede e CAINDO
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
-		# Se a velocidade de queda for maior que o limite, a gente trava no limite
 		if velocity.y > WALL_SLIDE_SPEED:
 			velocity.y = WALL_SLIDE_SPEED
+		
+		# Se ele estiver atacando e bater na parede, cancelamos o ataque
+		if status == PlayerState.attack:
+			status = PlayerState.jump # Volta para o estado de ar
+			
+		if sprite.animation != "Idle":
+			go_to_wall_slide_state()
+
+func is_sliding_on_wall() -> bool:
+	# Retorna TRUE se estiver no ar, encostado na parede e caindo
+	return is_on_wall() and not is_on_floor() and velocity.y > 0
 	
 func is_on_steep_slope() -> bool:
 	if is_on_floor():
@@ -500,7 +539,11 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 			body.take_damage(1, global_position, direcao_golpe)
 
 #Ativa a hitbox do ataque, apenas no estado de ataque
-func _on_animated_sprite_2d_frame_changed() -> void:	
+func _on_animated_sprite_2d_frame_changed() -> void:
+	if status != PlayerState.attack:
+		hitbox.monitoring = false # Garante que a hitbox desligue se o estado mudar
+		return
+	
 	if status != PlayerState.attack:
 		return
 	# Exemplo: O Ataque 1 bate no frame 2, o Ataque 2 bate no frame 3
