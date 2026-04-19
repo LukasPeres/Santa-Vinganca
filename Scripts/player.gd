@@ -22,6 +22,10 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
+var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
+
+
 # --- CONFIGURAÇÕES (CONSTANTES) ---
 const COYOTE_TIME = 0.15 # 150ms é o padrão "justo" para plataformas
 var coyote_timer = 0.0    # O cronómetro que vai diminuir no ar
@@ -288,14 +292,14 @@ func slide_state():
 		return
 
 func go_to_idle_state():
-	status = PlayerState.idle #Vai para o estado parado
-	hitbox.monitoring = false #Garante que nesse modo, a hitbox vai estar off
-	sprite.play("Idle") #Toca a animação parado
+	status = PlayerState.idle
+	hitbox.monitoring = false
+	sprite.play("Idle")
 	
 func go_to_walk_state():
 	status = PlayerState.walk
 	hitbox.monitoring = false
-	sprite.play("Idle")
+	sprite.play("Andando")
 	
 func go_to_jump_state():
 	status = PlayerState.jump
@@ -306,9 +310,17 @@ func go_to_jump_state():
 	
 func go_to_attack_state():
 	status = PlayerState.attack
-	sprite.play("Ataque")
-	hitbox.monitoring = false #Está desligada porque ela é ativa em frames
-	#especificos
+	combo_stage = 1
+	combo_window_timer = 1.0 # Abre 1 segundo para o próximo clique
+	sprite.play("Ataque_1") # Nome da sua primeira animação
+	hitbox.monitoring = false
+	
+func go_to_attack_2_state():
+	status = PlayerState.attack
+	combo_stage = 2 # Avança o combo
+	combo_window_timer = 0.0 # Reseta o timer pois já usou o combo
+	sprite.play("Ataque_2") # Nome da sua segunda animação
+	hitbox.monitoring = false
 	
 func go_to_dash_state():
 	status = PlayerState.dash
@@ -391,6 +403,13 @@ func update_timers(delta):
 
 	if knockback_timer > 0:
 		knockback_timer -= delta
+		
+	if combo_window_timer > 0:
+		combo_window_timer -= delta
+	else:
+		# Se o tempo acabar e o player não atacou de novo, o combo volta a 0
+		if status != PlayerState.attack:
+			combo_stage = 0
 	
 #Movimentação
 func move():
@@ -436,7 +455,11 @@ func check_weapon_swap():
 func use_weapon():
 	match current_weapon:
 		WeaponType.melee:
-			go_to_attack_state()
+			# Se já atacou e está dentro da janela de 1 segundo
+			if combo_stage == 1 and combo_window_timer > 0:
+				go_to_attack_2_state()
+			else:
+				go_to_attack_state() # O primeiro ataque
 		WeaponType.gun:
 			shoot_straight()
 		WeaponType.elf_gun:
@@ -480,6 +503,11 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 func _on_animated_sprite_2d_frame_changed() -> void:	
 	if status != PlayerState.attack:
 		return
+	# Exemplo: O Ataque 1 bate no frame 2, o Ataque 2 bate no frame 3
+	if sprite.animation == "Ataque_1":
+		hitbox.monitoring = (sprite.frame == 2)
+	elif sprite.animation == "Ataque_2":
+		hitbox.monitoring = (sprite.frame == 3)
 	
 	#Garante que no frame 1 do estado ataque, a hitbox de ataque seja ativada
 	if sprite.frame == 0 or 1 or 2:
@@ -521,7 +549,6 @@ func reload_scene():
 	get_tree().reload_current_scene()
 	
 func update_animation_offsets():
-
 	# reset padrão
 	sprite.offset = Vector2.ZERO
 
@@ -530,8 +557,12 @@ func update_animation_offsets():
 		PlayerState.attack:
 			sprite.offset.y = -3
 
-		PlayerState.idle, PlayerState.walk:
+		PlayerState.idle:
 			sprite.offset.y = -1
+			
+			
+		PlayerState.walk:
+			sprite.offset.y = 0
 			
 func can_dash() -> bool:
 	return dash_count < MAX_DASHES
