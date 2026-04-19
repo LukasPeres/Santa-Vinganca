@@ -22,6 +22,9 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+const DASH_COOLDOWN = 0.35 # Meio segundo entre um dash e outro
+var dash_cooldown_timer = 0.0
+
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
 var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
 
@@ -355,6 +358,7 @@ func go_to_dash_state():
 	status = PlayerState.dash
 	dash_timer = DASH_TIME
 	dash_count += 1
+	dash_cooldown_timer = DASH_COOLDOWN # <--- TRAVA O DASH AQUI
 	
 	hitbox.monitoring = false
 	
@@ -445,6 +449,9 @@ func update_timers(delta):
 		
 	if combo_window_timer > 0:
 		combo_window_timer -= delta
+		
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
 	else:
 		# Se o tempo acabar e o player não atacou de novo, o combo volta a 0
 		if status != PlayerState.attack:
@@ -608,4 +615,5 @@ func update_animation_offsets():
 			sprite.offset.y = 0
 			
 func can_dash() -> bool:
-	return dash_count < MAX_DASHES
+	# Só pode dar dash se tiver cargas disponíveis E o cooldown chegou a zero
+	return dash_count < MAX_DASHES and dash_cooldown_timer <= 0

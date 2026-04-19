@@ -14,9 +14,13 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tadl6"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_djjgj"]
+size = Vector2(34.5, 41)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=717619941]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dck1r"]
+size = Vector2(34.5, 42)
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=717619941 groups=["enemy"]]
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("1_ecgxc")
@@ -27,4 +31,11 @@ sprite_frames = SubResource("SpriteFrames_dck1r")
 animation = &"Idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=76702827]
-shape = SubResource("CapsuleShape2D_tadl6")
+position = Vector2(2.75, 0)
+shape = SubResource("RectangleShape2D_djjgj")
+
+[node name="PossessionArea" type="Area2D" parent="." unique_id=935367398]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PossessionArea" unique_id=1701873360]
+position = Vector2(2.75, 0)
+shape = SubResource("RectangleShape2D_dck1r")

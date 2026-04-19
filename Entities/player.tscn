@@ -215,6 +215,7 @@ animations = [{
 size = Vector2(26, 51)
 
 [node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
+z_index = 1
 collision_layer = 2
 floor_constant_speed = true
 script = ExtResource("1_tcnsb")
