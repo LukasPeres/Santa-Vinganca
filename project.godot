@@ -22,10 +22,6 @@ window/size/viewport_height=200
 window/size/mode=2
 window/stretch/mode="canvas_items"
 
-[editor]
-
-movie_writer/movie_file="C:/Users/peres/Documents/Codigo/Projetos/SantaVinganca/Videos/video_teste.ogv"
-
 [global_group]
 
 player=""

@@ -5,8 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://diwq2hi5m2pf8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-1.png" id="3_kee72"]
 [ext_resource type="Texture2D" uid="uid://cfm5tnwy30vhl" path="res://Sprites/Personagens/Papanel/Papanel-idle.png" id="3_xd3k7"]
 [ext_resource type="Texture2D" uid="uid://cjsmoenbpqwj8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-2.png" id="4_prmdv"]
-[ext_resource type="Texture2D" uid="uid://cnkbkqqdpuytv" path="res://Sprites/Personagens/Papanel/Papanel-caindo.png" id="5_s1j76"]
-[ext_resource type="Texture2D" uid="uid://b2ufn834r28tk" path="res://Sprites/Personagens/Papanel/Papanel-pulando.png" id="7_6jj0l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
 size = Vector2(19, 45)
@@ -164,14 +162,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_s1j76")
-}],
-"loop": true,
-"name": &"Cair",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_s1j76")
 }, {
 "duration": 1.0,
@@ -201,18 +191,10 @@ animations = [{
 "loop": true,
 "name": &"Idle",
 "speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("7_6jj0l")
-}],
-"loop": true,
-"name": &"Pulo",
-"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xd3k7"]
-size = Vector2(26, 51)
+size = Vector2(20, 44)
 
 [node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
 z_index = 1
@@ -228,7 +210,7 @@ shape = SubResource("RectangleShape2D_taegk")
 position = Vector2(0, -17)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Pulo"
+animation = &"Ataque_1"
 autoplay = "Idle"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]
@@ -236,7 +218,7 @@ collision_layer = 15
 collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=307324714]
-position = Vector2(24, -19.5)
+position = Vector2(21, -16)
 shape = SubResource("RectangleShape2D_xd3k7")
 debug_color = Color(0.5126275, 0.54585844, 0.5256797, 0.41960785)
 
