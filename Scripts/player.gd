@@ -549,20 +549,28 @@ func reload_scene():
 	get_tree().reload_current_scene()
 	
 func update_animation_offsets():
-	# reset padrão
+	# Reset padrão para evitar que um estado suje o outro
 	sprite.offset = Vector2.ZERO
 
-	# correção da animação de ataque
-	match status:
-		PlayerState.attack:
-			sprite.offset.y = -3
-
-		PlayerState.idle:
-			sprite.offset.y = -1
+	# 1. Primeiro checamos se o player está atacando
+	if status == PlayerState.attack:
+		# Aqui é o segredo: mudamos o offset baseado no NOME da animação
+		if sprite.animation == "Ataque_1":
+			sprite.offset.y = -10  # Ajuste para o primeiro golpe
+			sprite.offset.x = 0   # Se precisar mover para os lados também
+		elif sprite.animation == "Ataque_2":
+			sprite.offset.y = -8  # Ajuste diferente para o segundo golpe
+			sprite.offset.x = 2   # Exemplo: se ele der um passo a frente
 			
-			
-		PlayerState.walk:
-			sprite.offset.y = 0
+	# 2. Se não estiver atacando, segue a lógica normal dos outros estados
+	else:
+		match status:
+			PlayerState.idle:
+				sprite.offset.y = -1
+			PlayerState.walk:
+				sprite.offset.y = 0
+			PlayerState.jump:
+				sprite.offset.y = -2 # Exemplo caso o pulo também precise
 			
 func can_dash() -> bool:
 	return dash_count < MAX_DASHES

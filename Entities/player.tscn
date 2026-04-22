@@ -194,7 +194,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xd3k7"]
-size = Vector2(20, 44)
+size = Vector2(25, 52)
 
 [node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
 collision_layer = 2
@@ -211,13 +211,14 @@ scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
 animation = &"Ataque_1"
 autoplay = "Idle"
+frame = 1
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]
 collision_layer = 15
 collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=307324714]
-position = Vector2(21, -16)
+position = Vector2(23.5, -20)
 shape = SubResource("RectangleShape2D_xd3k7")
 debug_color = Color(0.5126275, 0.54585844, 0.5256797, 0.41960785)
 
