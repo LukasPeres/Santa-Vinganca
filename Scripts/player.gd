@@ -125,7 +125,8 @@ func update_state(delta):
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	move() #Possibilita movimento nesse estado
-	
+	if not is_on_floor():
+		go_to_falling()
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -162,7 +163,8 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 		
 func walk_state():
 	move()
-	
+	if not is_on_floor():
+		go_to_falling()
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -200,7 +202,8 @@ func walk_state():
 	
 func jump_state():
 	move()
-	
+	if velocity.y > 0 and sprite.animation == "Pulando":
+		go_to_falling()
 	# Permite pular de novo se bater em uma parede no ar
 	if wants_jump() and handle_wall_jump():
 		return # O handle_wall_jump já aplicou a velocidade
@@ -342,10 +345,15 @@ func go_to_walk_state():
 	
 func go_to_jump_state():
 	status = PlayerState.jump
-	hitbox.monitoring = false
 	velocity.y = JUMP_VELOCITY
-	sprite.play("Idle")
-	coyote_timer = 0.0
+	sprite.play("Pulando")
+	print("LOG: Iniciou Pulo (Subindo)")
+
+func go_to_falling():
+	# Mantemos o status como jump, pois a lógica física é a mesma
+	status = PlayerState.jump 
+	sprite.play("Caindo")
+	print("LOG: Iniciou Queda (Descendo)")
 	
 func go_to_attack_state():
 	status = PlayerState.attack
@@ -392,7 +400,7 @@ func go_to_possessed_state(_ghost_ref):
 	var screen_center = get_viewport_rect().size.x / 2
 	possessed_dir = 1 if screen_pos > screen_center else -1
 	
-	sprite.play("Idle") # Ou "Possuido" se você tiver a animação
+	sprite.play("Possuido") # Ou "Possuido" se você tiver a animação
 
 func apply_spasm():
 	spasm_count += 1

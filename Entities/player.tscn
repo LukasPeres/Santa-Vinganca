@@ -5,6 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://diwq2hi5m2pf8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-1.png" id="3_kee72"]
 [ext_resource type="Texture2D" uid="uid://cfm5tnwy30vhl" path="res://Sprites/Personagens/Papanel/Papanel-idle.png" id="3_xd3k7"]
 [ext_resource type="Texture2D" uid="uid://cjsmoenbpqwj8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-2.png" id="4_prmdv"]
+[ext_resource type="Texture2D" uid="uid://cnkbkqqdpuytv" path="res://Sprites/Personagens/Papanel/Papanel-caindo.png" id="5_6jj0l"]
+[ext_resource type="Texture2D" uid="uid://cg3kskum08dma" path="res://Sprites/Personagens/Papanel/Papanel-andando-possuido.png" id="7_ua6mu"]
+[ext_resource type="Texture2D" uid="uid://b2ufn834r28tk" path="res://Sprites/Personagens/Papanel/Papanel-pulando.png" id="8_xy0x1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
 size = Vector2(19, 45)
@@ -101,6 +104,38 @@ region = Rect2(315, 0, 45, 66)
 atlas = ExtResource("3_xd3k7")
 region = Rect2(360, 0, 45, 66)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_738w2"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(0, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b1m20"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(60, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w8hnq"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(120, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vknsg"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(180, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_005q7"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(240, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3vikf"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(300, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nbmgb"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(360, 0, 60, 65)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o8fg7"]
+atlas = ExtResource("7_ua6mu")
+region = Rect2(420, 0, 60, 65)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_xd3k7"]
 animations = [{
 "frames": [{
@@ -162,6 +197,14 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("5_6jj0l")
+}],
+"loop": false,
+"name": &"Caindo",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_s1j76")
 }, {
 "duration": 1.0,
@@ -191,12 +234,50 @@ animations = [{
 "loop": true,
 "name": &"Idle",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_738w2")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_b1m20")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_w8hnq")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_vknsg")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_005q7")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_3vikf")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_nbmgb")
+}, {
+"duration": 0.8,
+"texture": SubResource("AtlasTexture_o8fg7")
+}],
+"loop": true,
+"name": &"Possuido",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_xy0x1")
+}],
+"loop": true,
+"name": &"Pulando",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xd3k7"]
 size = Vector2(25, 52)
 
 [node name="player" type="CharacterBody2D" unique_id=1350439359 groups=["player"]]
+z_index = 1
 collision_layer = 2
 floor_constant_speed = true
 script = ExtResource("1_tcnsb")
@@ -209,9 +290,8 @@ shape = SubResource("RectangleShape2D_taegk")
 position = Vector2(0, -17)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Ataque_1"
+animation = &"Possuido"
 autoplay = "Idle"
-frame = 1
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]
 collision_layer = 15
