@@ -8,7 +8,8 @@ enum PlayerState{
 	jump,
 	attack,
 	dash,
-	slide
+	slide, 
+	possessed
 }
 
 #State Machine das armas
@@ -25,6 +26,12 @@ enum WeaponType{
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
 var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
 
+# --- SISTEMA DE POSSESSÃO ---
+var is_spasm_active: bool = false 
+var possessed_dir: int = 0
+var spasm_count: int = 0
+var spasm_cooldown: float = 0.0
+const SPASM_CHANCES = [0.15, 0.35, 0.60, 1.0] # 15%, 35%, 60% e 100% de chance de sair
 
 # --- CONFIGURAÇÕES (CONSTANTES) ---
 const COYOTE_TIME = 0.15 # 150ms é o padrão "justo" para plataformas
@@ -98,7 +105,7 @@ func apply_gravity(delta):
 	if not is_on_floor():
 		velocity += get_gravity() * 0.8 * delta
 
-func update_state(_delta):
+func update_state(delta):
 	match status:
 		PlayerState.idle:
 			idle_state()
@@ -112,6 +119,8 @@ func update_state(_delta):
 			dash_state()
 		PlayerState.slide:
 			slide_state()
+		PlayerState.possessed:
+			possessed_state(delta)
 
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
@@ -291,6 +300,36 @@ func slide_state():
 			go_to_idle_state()
 		return
 
+func possessed_state(delta):
+	apply_gravity(delta)
+	
+	if spasm_cooldown > 0:
+		spasm_cooldown -= delta
+	
+	var target_vel = 0.0
+	
+	if is_spasm_active:
+		# Aumentamos a força da resistência (de 0.8 para 1.5)
+		# Isso vai dar aquele "tranco" para o lado oposto
+		target_vel = -possessed_dir * (SPEED * 1.5) 
+	else:
+		# Diminuímos a velocidade do fantasma (de 0.4 para 0.25)
+		# Agora ele vai arrastar o Papanel bem mais devagar
+		target_vel = possessed_dir * (SPEED * 0.4)  
+	
+	# Aumentamos o peso do move_toward (de 10 para 20) para a resposta ser mais rápida
+	velocity.x = move_toward(velocity.x, target_vel, 20)
+	sprite.flip_h = (velocity.x < 0)
+
+	if spasm_cooldown <= 0:
+		if Input.is_action_just_pressed("left") or Input.is_action_just_pressed("right") or \
+		   Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("attack"):
+			apply_spasm()
+	
+	move_and_slide()
+	
+	#Go_to_states
+
 func go_to_idle_state():
 	status = PlayerState.idle
 	hitbox.monitoring = false
@@ -340,7 +379,44 @@ func go_to_slide_state():
 	print("--- SLIDE ATIVADO! Inclinação: ", get_floor_normal().x)
 	sprite.play("Idle") # Substitua pela animação do Pietro depois
 	hitbox.monitoring = false
+
+func go_to_possessed_state(_ghost_ref):
+	print("LOG: Papanel foi possuído!")
+	status = PlayerState.possessed
+	spasm_count = 0
+	spasm_cooldown = 0.0
+	is_spasm_active = false
 	
+	# Decide direção: puxa para o lado mais longe do centro da tela
+	var screen_pos = get_global_transform_with_canvas().origin.x
+	var screen_center = get_viewport_rect().size.x / 2
+	possessed_dir = 1 if screen_pos > screen_center else -1
+	
+	sprite.play("Idle") # Ou "Possuido" se você tiver a animação
+
+func apply_spasm():
+	spasm_count += 1
+	spasm_cooldown = 0.6 
+	is_spasm_active = true
+	print("LOG: Tentativa de resistência nº: ", spasm_count)
+	
+	# Timer curto de controle
+	await get_tree().create_timer(0.2).timeout
+	if status == PlayerState.possessed:
+		is_spasm_active = false
+	
+	# Cálculo de chance de liberdade
+	var chance_idx = clampi(spasm_count - 1, 0, SPASM_CHANCES.size() - 1)
+	var roll = randf()
+	print("LOG: Roll de liberdade: ", roll, " vs Chance: ", SPASM_CHANCES[chance_idx])
+	
+	if roll < SPASM_CHANCES[chance_idx]:
+		print("LOG: Papanel se libertou!")
+		# Pequeno knockback pra cima pra dar feedback visual de que saiu
+		velocity.y = -150 
+		take_damage(1, global_position)
+		go_to_idle_state()
+
 func wants_jump():
 	return Input.is_action_just_pressed("jump")
 
@@ -552,7 +628,13 @@ func update_animation_offsets():
 	# Reset padrão para evitar que um estado suje o outro
 	sprite.offset = Vector2.ZERO
 
-	# 1. Primeiro checamos se o player está atacando
+	if status == PlayerState.possessed and is_spasm_active:
+		# Tremor visual forte no eixo X
+		# Escolhe um número aleatório entre -4 e 4 a cada frame
+		sprite.offset.x = randf_range(-7, 7) 
+		# Mantém o pé no chão do Idle
+		sprite.offset.y = -1
+		
 	if status == PlayerState.attack:
 		# Aqui é o segredo: mudamos o offset baseado no NOME da animação
 		if sprite.animation == "Ataque_1":

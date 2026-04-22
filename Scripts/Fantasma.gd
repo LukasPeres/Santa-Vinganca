@@ -176,6 +176,15 @@ func die():
 # Detecta colisão com o player para causar dano
 # Responsabilidade: Causar dano no Santa Vingança
 # =========================================================
-func _on_damage_area_body_entered(body: Node2D) -> void:
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		body.take_damage(1, global_position)
+		# SÓ entra se o status do player NÃO for 'possessed'
+		if body.status != body.PlayerState.possessed:
+			if body.has_method("go_to_possessed_state"):
+				body.go_to_possessed_state(self)
+				queue_free() # Fantasma entra no player
+		else:
+			# Se ele já está possuído, o fantasma apenas dá um dano normal ou some
+			print("Player já está possuído, ignorando!")
+			# Opcional: queue_free() aqui também se quiser que o fantasma bata e suma
