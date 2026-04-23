@@ -9,7 +9,7 @@
 [node name="Parte2DaFase" type="Node2D" unique_id=1850883386]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("2_ai076")]
-position = Vector2(1394, -2588)
+position = Vector2(626, -717)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("3_ai076")]
 position = Vector2(56, -88)
@@ -20,9 +20,11 @@ limit_bottom = 161
 
 [node name="CharacterBody2D" parent="." unique_id=717619941 instance=ExtResource("4_5odxa")]
 position = Vector2(352, -648)
+gender = 1
 
 [node name="CharacterBody2D5" parent="." unique_id=830522682 instance=ExtResource("4_5odxa")]
 position = Vector2(1648, -2008)
+gender = 1
 
 [node name="CharacterBody2D6" parent="." unique_id=446783923 instance=ExtResource("4_5odxa")]
 position = Vector2(1944, -1968)
@@ -35,9 +37,11 @@ position = Vector2(1504, -2032)
 
 [node name="CharacterBody2D4" parent="." unique_id=1202670436 instance=ExtResource("4_5odxa")]
 position = Vector2(1872, -1712)
+gender = 1
 
 [node name="CharacterBody2D2" parent="." unique_id=988392821 instance=ExtResource("4_5odxa")]
 position = Vector2(272, -632)
+gender = 1
 
 [node name="Tileset" type="Node2D" parent="." unique_id=316816546]
 
