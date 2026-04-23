@@ -1,8 +1,45 @@
 [gd_scene format=3 uid="uid://dhlylo5ndctjh"]
 
 [ext_resource type="Script" uid="uid://8ahd8vu0y5mt" path="res://Scripts/elf_bullet.gd" id="1_sr4st"]
+[ext_resource type="Texture2D" uid="uid://y0nqbksbf4ma" path="res://Sprites/Personagens/Papanel/elfineo.png" id="2_8bx5e"]
 
 [sub_resource type="SeparationRayShape2D" id="SeparationRayShape2D_x4jyj"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hjhmw"]
+atlas = ExtResource("2_8bx5e")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h2tv3"]
+atlas = ExtResource("2_8bx5e")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ewxhj"]
+atlas = ExtResource("2_8bx5e")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_biv80"]
+atlas = ExtResource("2_8bx5e")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2s8xu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hjhmw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h2tv3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ewxhj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_biv80")
+}],
+"loop": true,
+"name": &"Elfo",
+"speed": 5.0
+}]
 
 [node name="elf_bullet" type="CharacterBody2D" unique_id=1150324121]
 collision_layer = 2
@@ -16,5 +53,9 @@ debug_color = Color(0.6634427, 0.5132613, 5.7756904e-07, 0.41960785)
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1422196685]
 position = Vector2(-1, 9)
 rect = Rect2(-10, -10, 24, 22)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=795594543]
+sprite_frames = SubResource("SpriteFrames_2s8xu")
+animation = &"Elfo"
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

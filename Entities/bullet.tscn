@@ -1,14 +1,21 @@
 [gd_scene format=3 uid="uid://chs35ejfpuibg"]
 
 [ext_resource type="Script" uid="uid://bxnx2atwu06nk" path="res://Scripts/bullet.gd" id="1_ceooe"]
+[ext_resource type="Texture2D" uid="uid://dqgg7lh3rgwe6" path="res://Sprites/Personagens/Papanel/carvão.png" id="2_1myjp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ceooe"]
+radius = 7.071068
 
 [node name="Bullet" type="CharacterBody2D" unique_id=1200725158]
 collision_layer = 2
-collision_mask = 4
+collision_mask = 5
 script = ExtResource("1_ceooe")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1437939810]
 shape = SubResource("CircleShape2D_ceooe")
 debug_color = Color(0.65457684, 0.5179122, 0, 0.41960785)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=673638949]
+position = Vector2(-1.1920929e-07, -1.1920929e-07)
+scale = Vector2(0.75, 0.8125)
+texture = ExtResource("2_1myjp")

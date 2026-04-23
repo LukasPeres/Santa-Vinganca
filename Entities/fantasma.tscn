@@ -20,6 +20,7 @@ animations = [{
 size = Vector2(27, 42)
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=717619941]
+z_index = 1
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("1_ecgxc")

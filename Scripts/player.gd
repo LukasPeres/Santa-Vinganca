@@ -354,20 +354,25 @@ func go_to_falling():
 	status = PlayerState.jump 
 	sprite.play("Caindo")
 	print("LOG: Iniciou Queda (Descendo)")
-	
+
+func go_to_wall_slide():
+	status = PlayerState.jump # Mantemos jump ou pode criar PlayerState.wall_slide se preferir
+	sprite.play("Idle") # Reset visual para não travar no frame de ataque
+	print("LOG: Entrou em Wall Slide")
+
 func go_to_attack_state():
 	status = PlayerState.attack
 	combo_stage = 1
 	combo_window_timer = 1.0 # Abre 1 segundo para o próximo clique
 	sprite.play("Ataque_1") # Nome da sua primeira animação
-	hitbox.monitoring = false
+	hitbox.monitoring = true
 	
 func go_to_attack_2_state():
 	status = PlayerState.attack
 	combo_stage = 2 # Avança o combo
 	combo_window_timer = 0.0 # Reseta o timer pois já usou o combo
 	sprite.play("Ataque_2") # Nome da sua segunda animação
-	hitbox.monitoring = false
+	hitbox.monitoring = true
 	
 func go_to_dash_state():
 	status = PlayerState.dash
@@ -440,26 +445,30 @@ func wants_dash():
 	return Input.is_action_just_pressed("dash") and can_dash()
 
 func handle_wall_jump() -> bool:
-	# 1. Checa se está na parede e NO AR
 	if is_on_wall() and not is_on_floor():
-		var wall_normal = get_wall_normal() # Retorna a direção OPOSTA à parede	
-		# 2. Aplica o impulso (Normal.x empurra para longe da parede)
+		var wall_normal = get_wall_normal()	
+		
 		velocity.x = wall_normal.x * WALL_JUMP_PUSHBACK
 		velocity.y = WALL_JUMP_VELOCITY
-		# 2. LIGA A TRAVA: O player não vai conseguir mudar o X por 0.15s
 		wall_jump_timer = WALL_JUMP_LOCK_TIME
-		#Sprite inverte
-		sprite.flip_h = (wall_normal.x < 0)
-		#Depois do walljump, é possivel fazer outro dash
-		#dash_count = 0 
 		
-		return true # Wall jump aconteceu!
-	return false # Não estava na parede
+		# --- CORREÇÃO DA HITBOX E DIREÇÃO ---
+		# Força o lado baseado na parede (Normal x > 0 significa parede na esquerda, pula pra direita)
+		sprite.flip_h = (wall_normal.x < 0)
+		hitbox.scale.x = -1 if sprite.flip_h else 1
+		
+		# Respeitando sua regra: usa o go_to_jump_state para iniciar a animação
+		go_to_jump_state()
+		
+		return true 
+	return false
 
 func handle_wall_slide(_delta):
-	# Só desliza se: estiver no ar, encostado na parede e CAINDO
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
-		# Se a velocidade de queda for maior que o limite, a gente trava no limite
+		# Se acabou de encostar na parede e não estava em slide, troca animação
+		if sprite.animation != "Idle" and status == PlayerState.jump:
+			go_to_wall_slide()
+			
 		if velocity.y > WALL_SLIDE_SPEED:
 			velocity.y = WALL_SLIDE_SPEED
 	
@@ -550,26 +559,30 @@ func use_weapon():
 			shoot_elf()
 
 func shoot_straight():
-
 	var bullet = preload("res://Entities/bullet.tscn").instantiate()
+	
+	# Define a direção antes de tudo
+	var dir = -1 if sprite.flip_h else 1
+	bullet.direction = dir
+	
+	# --- AJUSTE AQUI ---
+	# Vector2(Distância lateral, Altura)
+	# X: 20 pixels para a frente do centro
+	# Y: -10 pixels (sobe um pouco para sair na altura do braço/peito)
+	bullet.global_position = global_position + Vector2(25 * dir, -12)
+	
 	get_parent().add_child(bullet)
-
-	var direction = -1 if sprite.flip_h else 1
-	bullet.global_position = global_position + Vector2(20 * direction, 0)
-	bullet.direction = direction
 	
 func shoot_elf():
-
 	var bullet = preload("res://Entities/elf_bullet.tscn").instantiate()
 	get_parent().add_child(bullet)
 	
-	# 1. Primeiro definimos a direção baseada no sprite
 	var dir = -1 if sprite.flip_h else 1
 	
-	# 2. Agora usamos "dir" para posicionar a bala um pouco à frente do player
-	bullet.global_position = global_position + Vector2(20 * dir, 0)
+	# --- AJUSTE AQUI ---
+	# Se quiser que saia "de cima" do Papanel, coloque um valor negativo em Y (ex: -30)
+	bullet.global_position = global_position + Vector2(15 * dir, -25)
 	
-	# 3. Chamamos a função de lançamento que criamos na bala
 	bullet.launch(dir)
 
 #hitbox do ataque, so funciona no grupo enemy
@@ -586,18 +599,8 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 #Ativa a hitbox do ataque, apenas no estado de ataque
 func _on_animated_sprite_2d_frame_changed() -> void:	
 	if status != PlayerState.attack:
-		return
-	# Exemplo: O Ataque 1 bate no frame 2, o Ataque 2 bate no frame 3
-	if sprite.animation == "Ataque_1":
-		hitbox.monitoring = (sprite.frame == 2)
-	elif sprite.animation == "Ataque_2":
-		hitbox.monitoring = (sprite.frame == 3)
-	
-	#Garante que no frame 1 do estado ataque, a hitbox de ataque seja ativada
-	if sprite.frame == 0 or 1 or 2:
-		hitbox.monitoring = true
-	else:
 		hitbox.monitoring = false
+		return
 
 #Sistema de vida e Knockback recebido pelo player
 func take_damage(amount, from_position):

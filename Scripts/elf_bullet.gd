@@ -5,6 +5,8 @@ const THROW_SPEED = 120
 const THROW_UP = -400
 const GRAVITY = 900 
 
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+
 func _ready():
 	# Deixamos vazio porque o Player vai configurar a bala via launch()
 	pass
@@ -14,6 +16,9 @@ func launch(dir):
 	direction = dir
 	velocity.x = direction * THROW_SPEED
 	velocity.y = THROW_UP
+	if sprite:
+		sprite.play("Elfo")
+		sprite.flip_h = (direction < 0)
 
 func _physics_process(delta):
 	# Aplica a gravidade frame a frame para criar o arco

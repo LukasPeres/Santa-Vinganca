@@ -151,7 +151,7 @@ func dash_state(delta):
 	if timer_estado <= 0:
 		go_to_martelo_state()
 
-func martelo_state(delta):
+func martelo_state(_delta):
 	velocity.x = 0 # Para para bater
 
 # =========================================================
@@ -240,7 +240,7 @@ func executar_spawn_fase_2():
 	# Usamos global_position para que as novas peças nasçam exatamente onde o corpo/cabeça estavam
 	var pos_corpo = $corpo/PontoCorpo.global_position
 	var pos_cabeca = $corpo/PontoCabeca.global_position
-	var direcao_atual = -1.0 if anim.flip_h else 1.0
+	#var direcao_atual = -1.0 if anim.flip_h else 1.0
 	
 	# 4. Instanciar as cenas novas
 	var corpo_f2 = CORPO_FASE2_SCN.instantiate()
