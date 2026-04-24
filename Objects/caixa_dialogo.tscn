@@ -49,6 +49,15 @@ offset_bottom = 86.0
 expand_mode = 1
 stretch_mode = 5
 
+[node name="TextureRect2" type="TextureRect" parent="Control" unique_id=1373708274]
+layout_mode = 0
+offset_left = 214.0
+offset_top = 46.0
+offset_right = 254.0
+offset_bottom = 86.0
+expand_mode = 1
+stretch_mode = 5
+
 [node name="RichTextLabel" type="RichTextLabel" parent="Control" unique_id=2047959681]
 layout_mode = 0
 offset_left = 27.0
