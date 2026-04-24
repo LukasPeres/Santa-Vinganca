@@ -23,6 +23,7 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+var pode_se_mexer = true
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
 var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
 
@@ -85,6 +86,10 @@ func _ready() -> void:
 
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
+	if not pode_se_mexer:
+		velocity = Vector2.ZERO # Faz o player parar imediatamente
+		move_and_slide()
+		return # Sai da função e ignora os inputs de movimento
 	update_timers(delta)
 	handle_wall_slide(delta) # wall slide
 	update_ground_resources() # resetar habilidades

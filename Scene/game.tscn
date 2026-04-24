@@ -6,6 +6,8 @@
 [ext_resource type="TileSet" uid="uid://d1iygux1kot25" path="res://Sprites/Plataformas/tileset_gelo.tres" id="4_03iqk"]
 [ext_resource type="PackedScene" uid="uid://bn7mw8wr88drk" path="res://Entities/fantasma.tscn" id="5_ihreq"]
 [ext_resource type="TileSet" uid="uid://byu6nyyry6aow" path="res://Sprites/Decorações/decorações.tres" id="5_thj8p"]
+[ext_resource type="PackedScene" uid="uid://bjcsqj8ywkud7" path="res://Entities/pinguim.tscn" id="7_h8jt7"]
+[ext_resource type="PackedScene" uid="uid://wvg04iejado3" path="res://Objects/caixa_dialogo.tscn" id="8_sagxc"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
@@ -40,3 +42,8 @@ tile_set = ExtResource("5_thj8p")
 
 [node name="CharacterBody2D" parent="." unique_id=717619941 instance=ExtResource("5_ihreq")]
 position = Vector2(1893, 108)
+
+[node name="Pinguim" parent="." unique_id=2067125414 instance=ExtResource("7_h8jt7")]
+position = Vector2(507, 101)
+
+[node name="CaixaDialogo" parent="." unique_id=145387038 instance=ExtResource("8_sagxc")]
