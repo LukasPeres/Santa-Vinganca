@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://wvg04iejado3"]
+
+[ext_resource type="Script" uid="uid://djypq0psy85gu" path="res://Scripts/caixa_dialogo.gd" id="1_nc3lc"]
+[ext_resource type="Texture2D" uid="uid://pwu6dp2xyrys" path="res://Sprites/Portraits/caixadetexto.png" id="2_xwqhd"]
+[ext_resource type="Texture2D" uid="uid://cfruwyp8qn0ky" path="res://Sprites/Portraits/molduraboneco.png" id="3_r4525"]
+
+[node name="CaixaDialogo" type="CanvasLayer" unique_id=145387038 groups=["interface_sistema"]]
+script = ExtResource("1_nc3lc")
+
+[node name="Control" type="Control" parent="." unique_id=2110367914]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 26.0
+offset_top = 79.0
+offset_right = 73.0
+offset_bottom = 126.0
+mouse_filter = 2
+
+[node name="FundoBox" type="NinePatchRect" parent="Control" unique_id=150557944]
+modulate = Color(1, 1, 1, 0.78431374)
+layout_mode = 0
+offset_left = 54.0
+offset_top = 40.0
+offset_right = 267.88422
+offset_bottom = 109.0
+texture = ExtResource("2_xwqhd")
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1010979333]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 219.0
+offset_bottom = 52.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.039215688, 0.039215688, 0.101960786, 0.78431374)
+
+[node name="TextureRect" type="TextureRect" parent="Control" unique_id=1530737807]
+layout_mode = 0
+offset_left = -15.0
+offset_top = 45.0
+offset_right = 43.0
+offset_bottom = 103.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Control" unique_id=1373708274]
+layout_mode = 0
+offset_left = -22.0
+offset_top = 38.0
+offset_right = 51.0
+offset_bottom = 111.0
+texture = ExtResource("3_r4525")
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_lock_ = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control" unique_id=2047959681]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 53.0
+offset_right = 255.0
+offset_bottom = 96.0
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true

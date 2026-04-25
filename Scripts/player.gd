@@ -8,7 +8,8 @@ enum PlayerState{
 	jump,
 	attack,
 	dash,
-	slide
+	slide, 
+	possessed
 }
 
 #State Machine das armas
@@ -22,12 +23,16 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
-const DASH_COOLDOWN = 0.35 # Meio segundo entre um dash e outro
-var dash_cooldown_timer = 0.0
-
+var pode_se_mexer = true
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
 var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
 
+# --- SISTEMA DE POSSESSÃO ---
+var is_spasm_active: bool = false 
+var possessed_dir: int = 0
+var spasm_count: int = 0
+var spasm_cooldown: float = 0.0
+const SPASM_CHANCES = [0.15, 0.35, 0.60, 1.0] # 15%, 35%, 60% e 100% de chance de sair
 
 # --- CONFIGURAÇÕES (CONSTANTES) ---
 const COYOTE_TIME = 0.15 # 150ms é o padrão "justo" para plataformas
@@ -81,6 +86,10 @@ func _ready() -> void:
 
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
+	if not pode_se_mexer:
+		velocity = Vector2.ZERO # Faz o player parar imediatamente
+		move_and_slide()
+		return # Sai da função e ignora os inputs de movimento
 	update_timers(delta)
 	handle_wall_slide(delta) # wall slide
 	update_ground_resources() # resetar habilidades
@@ -101,7 +110,7 @@ func apply_gravity(delta):
 	if not is_on_floor():
 		velocity += get_gravity() * 0.8 * delta
 
-func update_state(_delta):
+func update_state(delta):
 	match status:
 		PlayerState.idle:
 			idle_state()
@@ -115,11 +124,14 @@ func update_state(_delta):
 			dash_state()
 		PlayerState.slide:
 			slide_state()
+		PlayerState.possessed:
+			possessed_state(delta)
 
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	move() #Possibilita movimento nesse estado
-	
+	if not is_on_floor():
+		go_to_falling()
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -156,7 +168,8 @@ func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 		
 func walk_state():
 	move()
-	
+	if not is_on_floor():
+		go_to_falling()
 	#Dash
 	if wants_dash():
 		go_to_dash_state()
@@ -194,7 +207,8 @@ func walk_state():
 	
 func jump_state():
 	move()
-	
+	if velocity.y > 0 and sprite.animation == "Pulando":
+		go_to_falling()
 	# Permite pular de novo se bater em uma parede no ar
 	if wants_jump() and handle_wall_jump():
 		return # O handle_wall_jump já aplicou a velocidade
@@ -294,6 +308,36 @@ func slide_state():
 			go_to_idle_state()
 		return
 
+func possessed_state(delta):
+	apply_gravity(delta)
+	
+	if spasm_cooldown > 0:
+		spasm_cooldown -= delta
+	
+	var target_vel = 0.0
+	
+	if is_spasm_active:
+		# Aumentamos a força da resistência (de 0.8 para 1.5)
+		# Isso vai dar aquele "tranco" para o lado oposto
+		target_vel = -possessed_dir * (SPEED * 1.5) 
+	else:
+		# Diminuímos a velocidade do fantasma (de 0.4 para 0.25)
+		# Agora ele vai arrastar o Papanel bem mais devagar
+		target_vel = possessed_dir * (SPEED * 0.4)  
+	
+	# Aumentamos o peso do move_toward (de 10 para 20) para a resposta ser mais rápida
+	velocity.x = move_toward(velocity.x, target_vel, 20)
+	sprite.flip_h = (velocity.x < 0)
+
+	if spasm_cooldown <= 0:
+		if Input.is_action_just_pressed("left") or Input.is_action_just_pressed("right") or \
+		   Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("attack"):
+			apply_spasm()
+	
+	move_and_slide()
+	
+	#Go_to_states
+
 func go_to_idle_state():
 	status = PlayerState.idle
 	hitbox.monitoring = false
@@ -306,30 +350,39 @@ func go_to_walk_state():
 	
 func go_to_jump_state():
 	status = PlayerState.jump
-	hitbox.monitoring = false
 	velocity.y = JUMP_VELOCITY
-	sprite.play("Idle")
-	coyote_timer = 0.0
-	
+	sprite.play("Pulando")
+	print("LOG: Iniciou Pulo (Subindo)")
+
+func go_to_falling():
+	# Mantemos o status como jump, pois a lógica física é a mesma
+	status = PlayerState.jump 
+	sprite.play("Caindo")
+	print("LOG: Iniciou Queda (Descendo)")
+
+func go_to_wall_slide():
+	status = PlayerState.jump # Mantemos jump ou pode criar PlayerState.wall_slide se preferir
+	sprite.play("Idle") # Reset visual para não travar no frame de ataque
+	print("LOG: Entrou em Wall Slide")
+
 func go_to_attack_state():
 	status = PlayerState.attack
 	combo_stage = 1
 	combo_window_timer = 1.0 # Abre 1 segundo para o próximo clique
 	sprite.play("Ataque_1") # Nome da sua primeira animação
-	hitbox.monitoring = false
+	hitbox.monitoring = true
 	
 func go_to_attack_2_state():
 	status = PlayerState.attack
 	combo_stage = 2 # Avança o combo
 	combo_window_timer = 0.0 # Reseta o timer pois já usou o combo
 	sprite.play("Ataque_2") # Nome da sua segunda animação
-	hitbox.monitoring = false
+	hitbox.monitoring = true
 	
 func go_to_dash_state():
 	status = PlayerState.dash
 	dash_timer = DASH_TIME
 	dash_count += 1
-	dash_cooldown_timer = DASH_COOLDOWN # <--- TRAVA O DASH AQUI
 	
 	hitbox.monitoring = false
 	
@@ -344,7 +397,44 @@ func go_to_slide_state():
 	print("--- SLIDE ATIVADO! Inclinação: ", get_floor_normal().x)
 	sprite.play("Idle") # Substitua pela animação do Pietro depois
 	hitbox.monitoring = false
+
+func go_to_possessed_state(_ghost_ref):
+	print("LOG: Papanel foi possuído!")
+	status = PlayerState.possessed
+	spasm_count = 0
+	spasm_cooldown = 0.0
+	is_spasm_active = false
 	
+	# Decide direção: puxa para o lado mais longe do centro da tela
+	var screen_pos = get_global_transform_with_canvas().origin.x
+	var screen_center = get_viewport_rect().size.x / 2
+	possessed_dir = 1 if screen_pos > screen_center else -1
+	
+	sprite.play("Possuido") # Ou "Possuido" se você tiver a animação
+
+func apply_spasm():
+	spasm_count += 1
+	spasm_cooldown = 0.6 
+	is_spasm_active = true
+	print("LOG: Tentativa de resistência nº: ", spasm_count)
+	
+	# Timer curto de controle
+	await get_tree().create_timer(0.2).timeout
+	if status == PlayerState.possessed:
+		is_spasm_active = false
+	
+	# Cálculo de chance de liberdade
+	var chance_idx = clampi(spasm_count - 1, 0, SPASM_CHANCES.size() - 1)
+	var roll = randf()
+	print("LOG: Roll de liberdade: ", roll, " vs Chance: ", SPASM_CHANCES[chance_idx])
+	
+	if roll < SPASM_CHANCES[chance_idx]:
+		print("LOG: Papanel se libertou!")
+		# Pequeno knockback pra cima pra dar feedback visual de que saiu
+		velocity.y = -150 
+		take_damage(1, global_position)
+		go_to_idle_state()
+
 func wants_jump():
 	return Input.is_action_just_pressed("jump")
 
@@ -360,26 +450,30 @@ func wants_dash():
 	return Input.is_action_just_pressed("dash") and can_dash()
 
 func handle_wall_jump() -> bool:
-	# 1. Checa se está na parede e NO AR
 	if is_on_wall() and not is_on_floor():
-		var wall_normal = get_wall_normal() # Retorna a direção OPOSTA à parede	
-		# 2. Aplica o impulso (Normal.x empurra para longe da parede)
+		var wall_normal = get_wall_normal()	
+		
 		velocity.x = wall_normal.x * WALL_JUMP_PUSHBACK
 		velocity.y = WALL_JUMP_VELOCITY
-		# 2. LIGA A TRAVA: O player não vai conseguir mudar o X por 0.15s
 		wall_jump_timer = WALL_JUMP_LOCK_TIME
-		#Sprite inverte
-		sprite.flip_h = (wall_normal.x < 0)
-		#Depois do walljump, é possivel fazer outro dash
-		#dash_count = 0 
 		
-		return true # Wall jump aconteceu!
-	return false # Não estava na parede
+		# --- CORREÇÃO DA HITBOX E DIREÇÃO ---
+		# Força o lado baseado na parede (Normal x > 0 significa parede na esquerda, pula pra direita)
+		sprite.flip_h = (wall_normal.x < 0)
+		hitbox.scale.x = -1 if sprite.flip_h else 1
+		
+		# Respeitando sua regra: usa o go_to_jump_state para iniciar a animação
+		go_to_jump_state()
+		
+		return true 
+	return false
 
 func handle_wall_slide(_delta):
-	# Só desliza se: estiver no ar, encostado na parede e CAINDO
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
-		# Se a velocidade de queda for maior que o limite, a gente trava no limite
+		# Se acabou de encostar na parede e não estava em slide, troca animação
+		if sprite.animation != "Idle" and status == PlayerState.jump:
+			go_to_wall_slide()
+			
 		if velocity.y > WALL_SLIDE_SPEED:
 			velocity.y = WALL_SLIDE_SPEED
 	
@@ -387,6 +481,17 @@ func is_on_steep_slope() -> bool:
 	if is_on_floor():
 		var n = get_floor_normal()
 		return abs(n.x) > 0.15 # Detecta qualquer inclinação
+	return false
+	
+func pode_interagir() -> bool:
+	# Só pode se estiver no chão
+	if not is_on_floor():
+		return false
+	
+	# Só pode se o estado atual for idle ou walk
+	if status == PlayerState.idle or status == PlayerState.walk:
+		return true
+		
 	return false
 	
 func update_timers(delta):
@@ -410,9 +515,6 @@ func update_timers(delta):
 		
 	if combo_window_timer > 0:
 		combo_window_timer -= delta
-		
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
 	else:
 		# Se o tempo acabar e o player não atacou de novo, o combo volta a 0
 		if status != PlayerState.attack:
@@ -473,26 +575,30 @@ func use_weapon():
 			shoot_elf()
 
 func shoot_straight():
-
 	var bullet = preload("res://Entities/bullet.tscn").instantiate()
+	
+	# Define a direção antes de tudo
+	var dir = -1 if sprite.flip_h else 1
+	bullet.direction = dir
+	
+	# --- AJUSTE AQUI ---
+	# Vector2(Distância lateral, Altura)
+	# X: 20 pixels para a frente do centro
+	# Y: -10 pixels (sobe um pouco para sair na altura do braço/peito)
+	bullet.global_position = global_position + Vector2(25 * dir, -12)
+	
 	get_parent().add_child(bullet)
-
-	var direction = -1 if sprite.flip_h else 1
-	bullet.global_position = global_position + Vector2(20 * direction, 0)
-	bullet.direction = direction
 	
 func shoot_elf():
-
 	var bullet = preload("res://Entities/elf_bullet.tscn").instantiate()
 	get_parent().add_child(bullet)
 	
-	# 1. Primeiro definimos a direção baseada no sprite
 	var dir = -1 if sprite.flip_h else 1
 	
-	# 2. Agora usamos "dir" para posicionar a bala um pouco à frente do player
-	bullet.global_position = global_position + Vector2(20 * dir, 0)
+	# --- AJUSTE AQUI ---
+	# Se quiser que saia "de cima" do Papanel, coloque um valor negativo em Y (ex: -30)
+	bullet.global_position = global_position + Vector2(15 * dir, -25)
 	
-	# 3. Chamamos a função de lançamento que criamos na bala
 	bullet.launch(dir)
 
 #hitbox do ataque, so funciona no grupo enemy
@@ -509,18 +615,8 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 #Ativa a hitbox do ataque, apenas no estado de ataque
 func _on_animated_sprite_2d_frame_changed() -> void:	
 	if status != PlayerState.attack:
-		return
-	# Exemplo: O Ataque 1 bate no frame 2, o Ataque 2 bate no frame 3
-	if sprite.animation == "Ataque_1":
-		hitbox.monitoring = (sprite.frame == 2)
-	elif sprite.animation == "Ataque_2":
-		hitbox.monitoring = (sprite.frame == 3)
-	
-	#Garante que no frame 1 do estado ataque, a hitbox de ataque seja ativada
-	if sprite.frame == 0 or 1 or 2:
-		hitbox.monitoring = true
-	else:
 		hitbox.monitoring = false
+		return
 
 #Sistema de vida e Knockback recebido pelo player
 func take_damage(amount, from_position):
@@ -556,21 +652,34 @@ func reload_scene():
 	get_tree().reload_current_scene()
 	
 func update_animation_offsets():
-	# reset padrão
+	# Reset padrão para evitar que um estado suje o outro
 	sprite.offset = Vector2.ZERO
 
-	# correção da animação de ataque
-	match status:
-		PlayerState.attack:
-			sprite.offset.y = -3
-
-		PlayerState.idle:
-			sprite.offset.y = -1
+	if status == PlayerState.possessed and is_spasm_active:
+		# Tremor visual forte no eixo X
+		# Escolhe um número aleatório entre -4 e 4 a cada frame
+		sprite.offset.x = randf_range(-7, 7) 
+		# Mantém o pé no chão do Idle
+		sprite.offset.y = -1
+		
+	if status == PlayerState.attack:
+		# Aqui é o segredo: mudamos o offset baseado no NOME da animação
+		if sprite.animation == "Ataque_1":
+			sprite.offset.y = -10  # Ajuste para o primeiro golpe
+			sprite.offset.x = 0   # Se precisar mover para os lados também
+		elif sprite.animation == "Ataque_2":
+			sprite.offset.y = -8  # Ajuste diferente para o segundo golpe
+			sprite.offset.x = 2   # Exemplo: se ele der um passo a frente
 			
-			
-		PlayerState.walk:
-			sprite.offset.y = 0
+	# 2. Se não estiver atacando, segue a lógica normal dos outros estados
+	else:
+		match status:
+			PlayerState.idle:
+				sprite.offset.y = -1
+			PlayerState.walk:
+				sprite.offset.y = 0
+			PlayerState.jump:
+				sprite.offset.y = -2 # Exemplo caso o pulo também precise
 			
 func can_dash() -> bool:
-	# Só pode dar dash se tiver cargas disponíveis E o cooldown chegou a zero
-	return dash_count < MAX_DASHES and dash_cooldown_timer <= 0
+	return dash_count < MAX_DASHES

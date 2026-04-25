@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bjcsqj8ywkud7"]
+
+[ext_resource type="Script" uid="uid://cb73huyvmbgi4" path="res://Scripts/pinguim.gd" id="1_6k228"]
+[ext_resource type="Texture2D" uid="uid://2k5kbosmqpv8" path="res://Sprites/Personagens/Fantasma/Menina Fantasma.png" id="2_swi6e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_swi6e"]
+size = Vector2(93, 92)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r5kaw"]
+atlas = ExtResource("2_swi6e")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_r5kaw"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r5kaw")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}]
+
+[node name="Pinguim" type="Area2D" unique_id=2067125414]
+collision_mask = 2
+script = ExtResource("1_6k228")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1413310917]
+shape = SubResource("RectangleShape2D_swi6e")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1236141592]
+sprite_frames = SubResource("SpriteFrames_r5kaw")
+animation = &"Idle"
+metadata/_edit_lock_ = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

@@ -50,15 +50,17 @@ func _physics_process(delta):
 # --- SISTEMA DE DANO ---
 
 # Agora a sua função de dano aceita a direção do golpe
-func take_damage(amount, _from_pos = Vector2.ZERO, direcao_golpe = Vector2.ZERO):
+# Adicionado o 4º argumento opcional no final
+func take_damage(amount, _from_pos = Vector2.ZERO, direcao_golpe = Vector2.ZERO, _is_proj = false):
 	health -= amount	
-	# SE houver uma direção de golpe (veio de um ataque do player)
 	if direcao_golpe != Vector2.ZERO:
 		print("Rebatendo cabeça!")
-		# Forçamos a velocidade para a direção do bastão
 		velocity_fase2 = direcao_golpe * speed
-		velocity_fase2.y -= 150 # O pulinho pra não pregar no chão
+		velocity_fase2.y -= 150 
 		flash_damage()
+
+	if health <= 0:
+		morrer()
 
 	
 	if health <= 0:

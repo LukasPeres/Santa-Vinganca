@@ -28,6 +28,7 @@ player=""
 enemy=""
 main_camera=""
 boss=""
+interface_sistema=""
 
 [input]
 

@@ -154,9 +154,10 @@ func disparar_chuva_bolas():
 		if "velocity" in bola:
 			bola.velocity = Vector2(forca_x, forca_y)
 
-func take_damage(amount, _from_pos = Vector2.ZERO, _dir = Vector2.ZERO):
+# Adicionado o 4º argumento opcional no final
+func take_damage(amount, _from_pos = Vector2.ZERO, _dir = Vector2.ZERO, _is_proj = false):
 	health -= amount
-	flash_damage() # Função de brilho que você já usa
+	flash_damage() 
 	
 	if health <= 0:
 		morrer()
