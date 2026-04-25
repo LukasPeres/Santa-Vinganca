@@ -108,10 +108,14 @@ func flash_damage():
 		tween.tween_property(sprite, "modulate", Color(10, 10, 10), 0.05)
 		tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
 
-func take_damage(amount, _from_pos = Vector2.ZERO, _is_projectile = false):
+# Adicionei o _dir no meio para completar os 4 espaços
+func take_damage(amount, _from_pos = Vector2.ZERO, _dir = Vector2.ZERO, _is_projectile = false):
 	flash_damage()
+	
+	# Se você vai repassar o dano para o pai, 
+	# o ideal é repassar todos os dados para evitar erros em cascata
 	if get_parent().has_method("take_damage"):
-		get_parent().take_damage(amount) 
+		get_parent().take_damage(amount, _from_pos, _dir, _is_projectile)
 
 func _on_hitbox_soco_body_entered(body):
 	if body.is_in_group("player"):

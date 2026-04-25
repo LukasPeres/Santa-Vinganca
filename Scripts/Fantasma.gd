@@ -179,19 +179,18 @@ func visual_float(delta):
 # Responsabilidade: Filtro de distância (Só aceita tiro de longe)
 # =========================================================
 # No script do INIMIGO (enemy.gd)
-func take_damage(amount, _from_position, _direction, is_projectile = false):
+# Altere a função para esta estrutura exata:
+func take_damage(amount, from_position, _direction, is_projectile = false):
 	# Se NÃO for um projétil, o fantasma ignora o dano
 	if not is_projectile:
 		print("LOG: Fantasma é imune a ataques físicos!")
-		# Opcional: Tocar um som de "erro" ou faísca
 		return 
 	
-	# Se for projétil, segue a vida normal
 	health -= amount
 	print("Fantasma atingido por projétil! Vida: ", health)
 	
 	if health <= 0:
-		queue_free()
+		die() # Chamando a função die para ficar organizado
 # =========================================================
 # Remove o inimigo da cena
 # Responsabilidade: Morte

@@ -27,9 +27,11 @@ func _physics_process(delta):
 		var body = collision.get_collider()
 
 		# Se bater em inimigo, dá dano
+# No bullet.gd, dentro do _physics_process
 		if body.is_in_group("enemy"):
 			if body.has_method("take_damage"):
 				var dir_impacto = Vector2(direction, 0)
+				# Agora você envia os 4 dados e ninguém reclama
 				body.take_damage(1, global_position, dir_impacto, true)
 		
 		# Independente de ser parede, chão ou inimigo, o carvão DEVE sumir

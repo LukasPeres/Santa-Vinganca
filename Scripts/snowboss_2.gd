@@ -390,9 +390,11 @@ func apply_gravity(delta):
 	if not is_on_floor():
 		velocity.y += 900 * delta
 
-func take_damage(amount, _pos = Vector2.ZERO, _proj = false):
+# Adicionamos o parâmetro '_dir' para completar os 4 que o tiro envia
+func take_damage(amount, _pos = Vector2.ZERO, _dir = Vector2.ZERO, _proj = false):
 	health -= amount
-	# Feedback visual de dano que mora no script do corpo
+	
+	# Feedback visual de dano
 	if corpo.has_method("flash_damage"):
 		corpo.flash_damage()
 

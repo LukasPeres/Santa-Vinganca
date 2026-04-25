@@ -101,10 +101,8 @@ func update_sensors():
 # Recebe dano
 # Responsabilidade: reduzir vida e reagir ao impacto
 # =========================================================
-func take_damage(amount, from_position, _is_projectile = false):
-	# REMOVEMOS O FILTRO DE DISTÂNCIA DAQUI.
-	# Agora, se a função foi chamada, o dano ENTRA, seja bala ou espada.
-
+# Adicione o ", _is_projectile = false" no final dos argumentos
+func take_damage(amount, from_position, _direction, _is_projectile = false):
 	health -= amount
 	print("Recebeu dano! Vida atual: ", health)
 	
