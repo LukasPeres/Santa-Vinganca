@@ -483,6 +483,17 @@ func is_on_steep_slope() -> bool:
 		return abs(n.x) > 0.15 # Detecta qualquer inclinação
 	return false
 	
+func pode_interagir() -> bool:
+	# Só pode se estiver no chão
+	if not is_on_floor():
+		return false
+	
+	# Só pode se o estado atual for idle ou walk
+	if status == PlayerState.idle or status == PlayerState.walk:
+		return true
+		
+	return false
+	
 func update_timers(delta):
 	# Lógica do Coyote Time
 	if is_on_floor():

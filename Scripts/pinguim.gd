@@ -8,7 +8,10 @@ func _ready():
 
 func _process(_delta):
 	if player_perto and Input.is_action_just_pressed("ui_accept"):
-		iniciar_dialogo()
+		var player = get_tree().get_first_node_in_group("player")
+		if player and player.pode_interagir():
+			get_viewport().set_input_as_handled() 
+			iniciar_dialogo()
 		
 func iniciar_dialogo():
 	var interface = get_tree().get_first_node_in_group("interface_sistema")
