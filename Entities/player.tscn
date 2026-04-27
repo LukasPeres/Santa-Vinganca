@@ -2,12 +2,16 @@
 
 [ext_resource type="Script" uid="uid://b3tgrhgpfl28a" path="res://Scripts/player.gd" id="1_tcnsb"]
 [ext_resource type="Texture2D" uid="uid://dqhhvs82dlhn0" path="res://Sprites/Personagens/Papanel/Papanel-andando.png" id="2_taegk"]
+[ext_resource type="Texture2D" uid="uid://b84trbyit620y" path="res://Sprites/Personagens/Papanel/Papanel-arremessando.png" id="3_k47j4"]
 [ext_resource type="Texture2D" uid="uid://diwq2hi5m2pf8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-1.png" id="3_kee72"]
 [ext_resource type="Texture2D" uid="uid://cfm5tnwy30vhl" path="res://Sprites/Personagens/Papanel/Papanel-idle.png" id="3_xd3k7"]
 [ext_resource type="Texture2D" uid="uid://cjsmoenbpqwj8" path="res://Sprites/Personagens/Papanel/Papanel-batendo-2.png" id="4_prmdv"]
 [ext_resource type="Texture2D" uid="uid://cnkbkqqdpuytv" path="res://Sprites/Personagens/Papanel/Papanel-caindo.png" id="5_6jj0l"]
+[ext_resource type="Texture2D" uid="uid://bylabhw8k8nnl" path="res://Sprites/Personagens/Papanel/Papanel-dashj.png" id="6_xakct"]
+[ext_resource type="Texture2D" uid="uid://yk1te2eft80p" path="res://Sprites/Personagens/Papanel/Papanel-parede.png" id="7_k47j4"]
 [ext_resource type="Texture2D" uid="uid://cg3kskum08dma" path="res://Sprites/Personagens/Papanel/Papanel-andando-possuido.png" id="7_ua6mu"]
 [ext_resource type="Texture2D" uid="uid://b2ufn834r28tk" path="res://Sprites/Personagens/Papanel/Papanel-pulando.png" id="8_xy0x1"]
+[ext_resource type="Texture2D" uid="uid://dg56lb4kmwrpc" path="res://Sprites/Personagens/Papanel/Papanel-slide.png" id="11_klb6e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
 size = Vector2(19, 45)
@@ -43,6 +47,14 @@ region = Rect2(348, 0, 58, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_x5h13"]
 atlas = ExtResource("2_taegk")
 region = Rect2(406, 0, 58, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbjbd"]
+atlas = ExtResource("3_k47j4")
+region = Rect2(0, 0, 50, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ka26g"]
+atlas = ExtResource("3_k47j4")
+region = Rect2(50, 0, 50, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o0d5x"]
 atlas = ExtResource("3_kee72")
@@ -168,6 +180,17 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbjbd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ka26g")
+}],
+"loop": true,
+"name": &"Arremessar",
+"speed": 5.0
+}, {
+"frames": [{
 "duration": 0.6,
 "texture": SubResource("AtlasTexture_o0d5x")
 }, {
@@ -201,6 +224,22 @@ animations = [{
 }],
 "loop": false,
 "name": &"Caindo",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_xakct")
+}],
+"loop": false,
+"name": &"Dash",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_k47j4")
+}],
+"loop": false,
+"name": &"Escorregar",
 "speed": 5.0
 }, {
 "frames": [{
@@ -271,6 +310,14 @@ animations = [{
 "loop": true,
 "name": &"Pulando",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_klb6e")
+}],
+"loop": false,
+"name": &"Slide",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xd3k7"]
@@ -290,7 +337,7 @@ shape = SubResource("RectangleShape2D_taegk")
 position = Vector2(0, -17)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Possuido"
+animation = &"Dash"
 autoplay = "Idle"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]

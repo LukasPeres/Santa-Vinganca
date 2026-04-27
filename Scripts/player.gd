@@ -50,8 +50,10 @@ const MAX_SLIDE_SPEED = 200.0
 const SLIDE_JUMP_BOOST = 1.3
 
 # Mecânicas Especiais
-const DASH_SPEED = 400
-const DASH_TIME = 0.15
+const DASH_COOLDOWN = 0.3 # Tempo de espera entre um dash e outro (em segundos)
+var dash_cooldown_timer = 0.0 # O cronómetro que vai diminuir com o tempo
+const DASH_SPEED = 300
+const DASH_TIME = 0.22
 const ATTACK_COOLDOWN_MS = 400
 const MAX_DASHES = 1 # <--- Adicionado para o sistema de pulo
 const WALL_JUMP_VELOCITY = -250.0 # Força para cima
@@ -269,15 +271,19 @@ func dash_state():
 	velocity.y = 0 
 
 	if dash_timer <= 0:
-		# Saída suave para não deslizar no sabão
+			# Saída suave para não deslizar no sabão
 		velocity.x *= 0.3
-		
-		# Transição de saída (Mantendo seu padrão de funções)
+			
+			# Transição de saída
 		if not is_on_floor():
-			status = PlayerState.jump
+				# EM VEZ DE SÓ MUDAR O STATUS:
+				# Chamamos a função que já troca o status E dá play no "Caindo"
+			go_to_falling()
 		else:
-			if velocity.x == 0: go_to_idle_state()
-			else: go_to_walk_state()
+			if velocity.x == 0:
+				go_to_idle_state()
+			else:
+				go_to_walk_state()
 
 func slide_state():
 	var n = get_floor_normal()
@@ -362,7 +368,7 @@ func go_to_falling():
 
 func go_to_wall_slide():
 	status = PlayerState.jump # Mantemos jump ou pode criar PlayerState.wall_slide se preferir
-	sprite.play("Idle") # Reset visual para não travar no frame de ataque
+	sprite.play("Escorregar") # Reset visual para não travar no frame de ataque
 	print("LOG: Entrou em Wall Slide")
 
 func go_to_attack_state():
@@ -383,6 +389,7 @@ func go_to_dash_state():
 	status = PlayerState.dash
 	dash_timer = DASH_TIME
 	dash_count += 1
+	dash_cooldown_timer = DASH_COOLDOWN # <--- Ativa o cooldown aqui
 	
 	hitbox.monitoring = false
 	
@@ -390,12 +397,12 @@ func go_to_dash_state():
 	velocity.x = direction * DASH_SPEED
 	velocity.y = 0
 	
-	sprite.play("Idle") # depois você pode colocar animação de dash
+	sprite.play("Dash")
 
 func go_to_slide_state():
 	status = PlayerState.slide
 	print("--- SLIDE ATIVADO! Inclinação: ", get_floor_normal().x)
-	sprite.play("Idle") # Substitua pela animação do Pietro depois
+	sprite.play("Slide") # Substitua pela animação do Pietro depois
 	hitbox.monitoring = false
 
 func go_to_possessed_state(_ghost_ref):
@@ -519,7 +526,8 @@ func update_timers(delta):
 		# Se o tempo acabar e o player não atacou de novo, o combo volta a 0
 		if status != PlayerState.attack:
 			combo_stage = 0
-	
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
 #Movimentação
 func move():
 	if wall_jump_timer > 0 or knockback_timer > 0: return
@@ -682,4 +690,5 @@ func update_animation_offsets():
 				sprite.offset.y = -2 # Exemplo caso o pulo também precise
 			
 func can_dash() -> bool:
-	return dash_count < MAX_DASHES
+	# Só pode dar dash se tiver cargas disponíveis E se o cooldown for 0
+	return dash_count < MAX_DASHES and dash_cooldown_timer <= 0
