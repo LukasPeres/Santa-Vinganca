@@ -99,6 +99,7 @@ func _physics_process(delta):
 	update_state(delta)       # lógica da state machine
 	check_weapon_swap()
 	update_animation_offsets()# visual
+	aplicar_rotacao_slide(delta) # <--- Adicione aqui
 
 	floor_snap_length = 8.0 if velocity.y >= 0 else 0.0
 	move_and_slide()          # movimento final
@@ -109,6 +110,12 @@ func update_ground_resources():
 
 #Gravidade
 func apply_gravity(delta):
+	# Se estiver escorregando na parede, não aplicamos gravidade normal
+	# Isso evita que ele "acelere" nas quinas entre blocos
+	if sprite.animation == "Escorregar" and is_on_wall():
+		velocity.y = WALL_SLIDE_SPEED
+		return
+
 	if not is_on_floor():
 		velocity += get_gravity() * 0.8 * delta
 
@@ -476,14 +483,24 @@ func handle_wall_jump() -> bool:
 	return false
 
 func handle_wall_slide(_delta):
+	var wall_normal = get_wall_normal()
+	var dir = Input.get_axis("left", "right")
+
+	if dir != 0 and sign(dir) == sign(wall_normal.x):
+		if status == PlayerState.jump and sprite.animation == "Escorregar":
+			go_to_falling()
+		return
+
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
-		# Se acabou de encostar na parede e não estava em slide, troca animação
-		if sprite.animation != "Idle" and status == PlayerState.jump:
+		sprite.flip_h = (wall_normal.x < 0) 
+
+		if sprite.animation != "Escorregar" and status == PlayerState.jump:
 			go_to_wall_slide()
+		
+		# Mantém o player "colado" na parede para evitar flicker nas quinas
+		velocity.x = -wall_normal.x * 10
 			
-		if velocity.y > WALL_SLIDE_SPEED:
-			velocity.y = WALL_SLIDE_SPEED
-	
+
 func is_on_steep_slope() -> bool:
 	if is_on_floor():
 		var n = get_floor_normal()
@@ -530,29 +547,39 @@ func update_timers(delta):
 		dash_cooldown_timer -= delta
 #Movimentação
 func move():
+	# 1. Travas de controle (se estiver em Wall Jump ou tomando dano)
 	if wall_jump_timer > 0 or knockback_timer > 0: return
 	
 	var dir = Input.get_axis("left", "right")
 	
+	# 2. TRAVA DE WALL SLIDE: 
+	# Se estiver na parede e segurando na direção DELA, travamos o visual.
+	if is_on_wall() and not is_on_floor() and dir != 0:
+		var wall_normal = get_wall_normal()
+		# Se a direção do teclado (dir) for oposta à normal (wall_normal),
+		# significa que o jogador está empurrando CONTRA a parede.
+		if sign(dir) != sign(wall_normal.x):
+			return # Bloqueia o flip e a velocidade para não "vibrar" na parede
+
+	# 3. LÓGICA DE MOVIMENTAÇÃO NORMAL
 	if dir:
 		var speed_multiplier = 1.2 if is_on_steep_slope() else 1.0
 		
-		# Lógica de Controle de Momentum
+		# Controle de Momentum no ar (Cálculo que você já tinha)
 		if not is_on_floor() and abs(velocity.x) > SPEED:
-			# Se você estiver indo para o mesmo lado do momentum, mantém a força
 			if sign(dir) == sign(velocity.x):
 				velocity.x = move_toward(velocity.x, dir * MAX_SLIDE_SPEED, 2)
 			else:
-				# Se apertar para o lado OPOSTO, você tem controle e freia o impulso
 				velocity.x = move_toward(velocity.x, dir * SPEED, 15) 
 		else:
-			# Movimento normal
+			# Movimento padrão
 			velocity.x = dir * SPEED * speed_multiplier
 			
+		# Atualiza a direção do personagem e da hitbox
 		sprite.flip_h = (dir < 0)
 		hitbox.scale.x = -1 if dir < 0 else 1
 	else:
-		# Freio: No ar o freio é menor para não parar seco
+		# Atrito/Freio (Friction)
 		var friction = 60 if is_on_floor() else 15
 		velocity.x = move_toward(velocity.x, 0, friction)
 
@@ -663,6 +690,17 @@ func update_animation_offsets():
 	# Reset padrão para evitar que um estado suje o outro
 	sprite.offset = Vector2.ZERO
 
+	if sprite.animation == "Escorregar":
+		# Se ele estiver olhando para a esquerda (parede na esquerda)
+		if sprite.flip_h:
+			sprite.offset.x = -7  # Ajuste esse número até encostar na parede
+		else:
+			# Parede na direita
+			sprite.offset.x = 10   # Ajuste esse número até encostar na parede
+		
+		sprite.offset.y = -2 # Ajuste se ele estiver "afundando" no chão ao chegar na base
+		return # Sai da função para não aplicar o match status abaixo
+		
 	if status == PlayerState.possessed and is_spasm_active:
 		# Tremor visual forte no eixo X
 		# Escolhe um número aleatório entre -4 e 4 a cada frame
@@ -687,8 +725,25 @@ func update_animation_offsets():
 			PlayerState.walk:
 				sprite.offset.y = 0
 			PlayerState.jump:
-				sprite.offset.y = -2 # Exemplo caso o pulo também precise
+				sprite.offset.y = -2
+			
 			
 func can_dash() -> bool:
 	# Só pode dar dash se tiver cargas disponíveis E se o cooldown for 0
 	return dash_count < MAX_DASHES and dash_cooldown_timer <= 0
+
+# No update_animation_offsets ou no _physics_process
+func aplicar_rotacao_slide(delta):
+	if status == PlayerState.slide:
+		# Pegamos a normal do chão (o vetor perpendicular à rampa)
+		var n = get_floor_normal()
+		
+		# Calculamos o ângulo da rampa baseado na normal
+		# O n.angle() nos dá o ângulo, mas precisamos compensar em 90° (PI/2)
+		var angulo_alvo = n.angle() + PI/2
+		
+		# Suavizamos a rotação para o ângulo da rampa
+		sprite.rotation = lerp_angle(sprite.rotation, angulo_alvo, 10 * delta)
+	else:
+		# Se não estiver em slide, volta a rotação para 0 suavemente
+		sprite.rotation = lerp_angle(sprite.rotation, 0, 15 * delta)
