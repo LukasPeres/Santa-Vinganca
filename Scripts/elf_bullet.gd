@@ -1,9 +1,9 @@
 extends CharacterBody2D
 # Variáveis de controle do projétil
 var direction = 1
-const THROW_SPEED = 120
-const THROW_UP = -400
-const GRAVITY = 900 
+const THROW_SPEED = 200
+const THROW_UP = -350
+const GRAVITY = 1200 
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 

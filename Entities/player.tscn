@@ -180,13 +180,13 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 0.6,
 "texture": SubResource("AtlasTexture_qbjbd")
 }, {
-"duration": 1.0,
+"duration": 0.6,
 "texture": SubResource("AtlasTexture_ka26g")
 }],
-"loop": true,
+"loop": false,
 "name": &"Arremessar",
 "speed": 5.0
 }, {
@@ -337,7 +337,7 @@ shape = SubResource("RectangleShape2D_taegk")
 position = Vector2(0, -17)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Dash"
+animation = &"Arremessar"
 autoplay = "Idle"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]

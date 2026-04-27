@@ -9,7 +9,8 @@ enum PlayerState{
 	attack,
 	dash,
 	slide, 
-	possessed
+	possessed,
+	throw
 }
 
 #State Machine das armas
@@ -23,6 +24,7 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+var ja_arremessou = false # Evita que nasçam 50 balas no mesmo frame
 var pode_se_mexer = true
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
 var combo_window_timer: float = 0.0 # Timer para o 1 segundo de janela
@@ -135,7 +137,8 @@ func update_state(delta):
 			slide_state()
 		PlayerState.possessed:
 			possessed_state(delta)
-
+		PlayerState.throw: 
+			throw_state()  
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	move() #Possibilita movimento nesse estado
@@ -348,7 +351,30 @@ func possessed_state(delta):
 			apply_spasm()
 	
 	move_and_slide()
+
+func throw_state():
+	# 1. Permite que o jogador use as setas para se mover ou cair
+	move() 
 	
+	# 2. LÓGICA DE SPAWN (Frame 1 como combinamos)
+	if sprite.frame == 1 and not ja_arremessou:
+		ja_arremessou = true 
+		if current_weapon == WeaponType.gun:
+			shoot_straight()
+		elif current_weapon == WeaponType.elf_gun:
+			shoot_elf()
+
+	# 3. LÓGICA DE SAÍDA
+	if not sprite.is_playing():
+		if is_on_floor():
+			if velocity.x == 0:
+				go_to_idle_state()
+			else:
+				go_to_walk_state()
+		else:
+			# Se terminar no ar, ele cai corretamente
+			go_to_falling()
+
 	#Go_to_states
 
 func go_to_idle_state():
@@ -426,6 +452,11 @@ func go_to_possessed_state(_ghost_ref):
 	
 	sprite.play("Possuido") # Ou "Possuido" se você tiver a animação
 
+func go_to_throw_state():
+	status = PlayerState.throw
+	ja_arremessou = false # Reseta para o novo arremesso
+	sprite.play("Arremessar")
+	
 func apply_spasm():
 	spasm_count += 1
 	spasm_cooldown = 0.6 
@@ -599,15 +630,13 @@ func check_weapon_swap():
 func use_weapon():
 	match current_weapon:
 		WeaponType.melee:
-			# Se já atacou e está dentro da janela de 1 segundo
 			if combo_stage == 1 and combo_window_timer > 0:
 				go_to_attack_2_state()
 			else:
-				go_to_attack_state() # O primeiro ataque
-		WeaponType.gun:
-			shoot_straight()
-		WeaponType.elf_gun:
-			shoot_elf()
+				go_to_attack_state()
+		# Em vez de atirar direto, mudamos para o estado de arremesso
+		WeaponType.gun, WeaponType.elf_gun:
+			go_to_throw_state()
 
 func shoot_straight():
 	var bullet = preload("res://Entities/bullet.tscn").instantiate()
@@ -620,7 +649,7 @@ func shoot_straight():
 	# Vector2(Distância lateral, Altura)
 	# X: 20 pixels para a frente do centro
 	# Y: -10 pixels (sobe um pouco para sair na altura do braço/peito)
-	bullet.global_position = global_position + Vector2(25 * dir, -12)
+	bullet.global_position = global_position + Vector2(20 * dir, -25)
 	
 	get_parent().add_child(bullet)
 	
@@ -632,7 +661,7 @@ func shoot_elf():
 	
 	# --- AJUSTE AQUI ---
 	# Se quiser que saia "de cima" do Papanel, coloque um valor negativo em Y (ex: -30)
-	bullet.global_position = global_position + Vector2(15 * dir, -25)
+	bullet.global_position = global_position + Vector2(20 * dir, -25)
 	
 	bullet.launch(dir)
 
@@ -649,9 +678,9 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 
 #Ativa a hitbox do ataque, apenas no estado de ataque
 func _on_animated_sprite_2d_frame_changed() -> void:	
-	if status != PlayerState.attack:
-		hitbox.monitoring = false
-		return
+	if status == PlayerState.attack:
+		# Deixe aqui apenas o que for do ataque de espada
+		pass
 
 #Sistema de vida e Knockback recebido pelo player
 func take_damage(amount, from_position):
@@ -679,8 +708,12 @@ func take_damage(amount, from_position):
 
 #Sistema de Morte
 func die():
+	if is_dead: return # Evita chamar a morte duas vezes
 	is_dead = true
-	print("Player morreu")
+	print("LOG: Player caiu no abismo ou morreu")
+	
+	# Desativa colisão para ele não ficar batendo em nada enquanto morre
+	set_physics_process(false) 	
 	call_deferred("reload_scene")
 	
 func reload_scene():

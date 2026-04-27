@@ -8,11 +8,12 @@
 [ext_resource type="TileSet" uid="uid://byu6nyyry6aow" path="res://Sprites/Decorações/decorações.tres" id="5_thj8p"]
 [ext_resource type="PackedScene" uid="uid://bjcsqj8ywkud7" path="res://Entities/pinguim.tscn" id="7_h8jt7"]
 [ext_resource type="PackedScene" uid="uid://wvg04iejado3" path="res://Objects/caixa_dialogo.tscn" id="8_sagxc"]
+[ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="9_8f6ah"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("1_mhtsl")]
-position = Vector2(3380, -423)
+position = Vector2(3432, -498)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("2_w51g1")]
 position = Vector2(120, 79)
@@ -47,3 +48,6 @@ position = Vector2(1893, 108)
 position = Vector2(507, 101)
 
 [node name="CaixaDialogo" parent="." unique_id=145387038 instance=ExtResource("8_sagxc")]
+
+[node name="KillZone" parent="." unique_id=1119116355 instance=ExtResource("9_8f6ah")]
+position = Vector2(3520, -463)
