@@ -46,7 +46,7 @@ tile_set = ExtResource("5_thj8p")
 position = Vector2(1893, 108)
 
 [node name="Pinguim" parent="." unique_id=2067125414 instance=ExtResource("7_h8jt7")]
-position = Vector2(507, 101)
+position = Vector2(512, 101)
 
 [node name="CaixaDialogo" parent="." unique_id=145387038 instance=ExtResource("8_sagxc")]
 

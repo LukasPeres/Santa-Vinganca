@@ -1,20 +1,27 @@
 [gd_scene format=3 uid="uid://bjcsqj8ywkud7"]
 
 [ext_resource type="Script" uid="uid://cb73huyvmbgi4" path="res://Scripts/pinguim.gd" id="1_6k228"]
-[ext_resource type="Texture2D" uid="uid://2k5kbosmqpv8" path="res://Sprites/Personagens/Fantasma/Menina Fantasma.png" id="2_swi6e"]
+[ext_resource type="Texture2D" uid="uid://ioa3pb43m5fx" path="res://Sprites/Personagens/Pinguim/pinguim-npc.png" id="2_swi6e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_swi6e"]
 size = Vector2(93, 92)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r5kaw"]
 atlas = ExtResource("2_swi6e")
-region = Rect2(0, 0, 64, 64)
+region = Rect2(0, 0, 9, 11)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nab7s"]
+atlas = ExtResource("2_swi6e")
+region = Rect2(9, 0, 9, 11)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_r5kaw"]
 animations = [{
 "frames": [{
-"duration": 1.0,
+"duration": 1.7,
 "texture": SubResource("AtlasTexture_r5kaw")
+}, {
+"duration": 1.7,
+"texture": SubResource("AtlasTexture_nab7s")
 }],
 "loop": true,
 "name": &"Idle",
@@ -29,6 +36,7 @@ script = ExtResource("1_6k228")
 shape = SubResource("RectangleShape2D_swi6e")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1236141592]
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_r5kaw")
 animation = &"Idle"
 metadata/_edit_lock_ = true
