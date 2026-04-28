@@ -24,6 +24,7 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+var direcao_forcada: int = 0 # 0 = normal, 1 = direita, -1 = esquerda
 var ja_arremessou = false # Evita que nasçam 50 balas no mesmo frame
 var pode_se_mexer = true
 var combo_stage: int = 0 # 0 = nenhum, 1 = primeiro ataque, 2 = segundo
@@ -87,6 +88,7 @@ func _ready() -> void:
 	add_to_group("player")
 	hitbox.monitoring = false #Hitbox de dano desligada
 	go_to_idle_state() #Começa Idle
+	direcao_forcada = 0
 
 #Gravidade - Caso o player não esteja no chão, adiciona velocidade vertical
 func _physics_process(delta):
@@ -576,27 +578,33 @@ func update_timers(delta):
 			combo_stage = 0
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
+		
 #Movimentação
+
 func move():
 	# 1. Travas de controle (se estiver em Wall Jump ou tomando dano)
 	if wall_jump_timer > 0 or knockback_timer > 0: return
 	
-	var dir = Input.get_axis("left", "right")
+	# --- ALTERAÇÃO AQUI: Prioridade para direção forçada ---
+	var dir: float
+	if direcao_forcada != 0:
+		dir = direcao_forcada
+	else:
+		dir = Input.get_axis("left", "right")
+	# -------------------------------------------------------
 	
 	# 2. TRAVA DE WALL SLIDE: 
 	# Se estiver na parede e segurando na direção DELA, travamos o visual.
 	if is_on_wall() and not is_on_floor() and dir != 0:
 		var wall_normal = get_wall_normal()
-		# Se a direção do teclado (dir) for oposta à normal (wall_normal),
-		# significa que o jogador está empurrando CONTRA a parede.
 		if sign(dir) != sign(wall_normal.x):
-			return # Bloqueia o flip e a velocidade para não "vibrar" na parede
+			return 
 
 	# 3. LÓGICA DE MOVIMENTAÇÃO NORMAL
 	if dir:
 		var speed_multiplier = 1.2 if is_on_steep_slope() else 1.0
 		
-		# Controle de Momentum no ar (Cálculo que você já tinha)
+		# Controle de Momentum no ar
 		if not is_on_floor() and abs(velocity.x) > SPEED:
 			if sign(dir) == sign(velocity.x):
 				velocity.x = move_toward(velocity.x, dir * MAX_SLIDE_SPEED, 2)
@@ -613,7 +621,6 @@ func move():
 		# Atrito/Freio (Friction)
 		var friction = 60 if is_on_floor() else 15
 		velocity.x = move_toward(velocity.x, 0, friction)
-
 
 #Sistema das Armas
 func check_weapon_swap():
@@ -717,7 +724,8 @@ func die():
 	call_deferred("reload_scene")
 	
 func reload_scene():
-	get_tree().reload_current_scene()
+	var fase_atual = get_tree().current_scene.scene_file_path
+	SceneTransition.change_scene(fase_atual)
 	
 func update_animation_offsets():
 	# Reset padrão para evitar que um estado suje o outro

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bxm4k56sv7iwq"]
+
+[ext_resource type="Script" uid="uid://cxeo4ovbqarcq" path="res://Scripts/exit_area.gd" id="1_wcdfy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1elig"]
+size = Vector2(34, 20)
+
+[node name="ExitArea" type="Area2D" unique_id=15717645]
+collision_mask = 3
+script = ExtResource("1_wcdfy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=376448199]
+scale = Vector2(6, 6)
+shape = SubResource("RectangleShape2D_1elig")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

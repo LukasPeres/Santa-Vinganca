@@ -9,11 +9,12 @@
 [ext_resource type="PackedScene" uid="uid://bjcsqj8ywkud7" path="res://Entities/pinguim.tscn" id="7_h8jt7"]
 [ext_resource type="PackedScene" uid="uid://wvg04iejado3" path="res://Objects/caixa_dialogo.tscn" id="8_sagxc"]
 [ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="9_8f6ah"]
+[ext_resource type="PackedScene" uid="uid://bxm4k56sv7iwq" path="res://Objects/exit_area.tscn" id="10_twwsd"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("1_mhtsl")]
-position = Vector2(3432, -498)
+position = Vector2(3435, -460)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("2_w51g1")]
 position = Vector2(120, 79)
@@ -50,4 +51,14 @@ position = Vector2(507, 101)
 [node name="CaixaDialogo" parent="." unique_id=145387038 instance=ExtResource("8_sagxc")]
 
 [node name="KillZone" parent="." unique_id=1119116355 instance=ExtResource("9_8f6ah")]
-position = Vector2(3520, -463)
+position = Vector2(255, 280)
+
+[node name="KillZone" parent="KillZone" unique_id=583757583 instance=ExtResource("9_8f6ah")]
+position = Vector2(1381, -18)
+
+[node name="KillZone" parent="KillZone/KillZone" unique_id=368701361 instance=ExtResource("9_8f6ah")]
+position = Vector2(1056, 3)
+
+[node name="ExitArea" parent="." unique_id=15717645 instance=ExtResource("10_twwsd")]
+position = Vector2(3608, -506)
+next_scene = "uid://c5krjso7e6k3e"
