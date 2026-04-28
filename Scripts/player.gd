@@ -519,20 +519,32 @@ func handle_wall_slide(_delta):
 	var wall_normal = get_wall_normal()
 	var dir = Input.get_axis("left", "right")
 
+	# 1. SE ESTAVA ESCORREGANDO E A PAREDE ACABOU (Plataforma voadora)
+	if sprite.animation == "Escorregar" and not is_on_wall():
+		direcao_forcada = 0
+		go_to_falling()
+		return
+
+	# 2. CHECAGEM DE SAÍDA VOLUNTÁRIA (Lado oposto)
 	if dir != 0 and sign(dir) == sign(wall_normal.x):
-		if status == PlayerState.jump and sprite.animation == "Escorregar":
+		direcao_forcada = 0
+		if sprite.animation == "Escorregar":
 			go_to_falling()
 		return
 
+	# 3. LÓGICA DE ENTRADA E MANUTENÇÃO
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
 		sprite.flip_h = (wall_normal.x < 0) 
 
 		if sprite.animation != "Escorregar" and status == PlayerState.jump:
 			go_to_wall_slide()
 		
-		# Mantém o player "colado" na parede para evitar flicker nas quinas
-		velocity.x = -wall_normal.x * 10
-			
+		# Ímã contra a parede
+		direcao_forcada = -sign(wall_normal.x)
+		velocity.x = direcao_forcada * 15.0
+	else:
+		# Reset padrão caso toque o chão ou saia por outro motivo
+		direcao_forcada = 0
 
 func is_on_steep_slope() -> bool:
 	if is_on_floor():
@@ -585,40 +597,48 @@ func move():
 	# 1. Travas de controle (se estiver em Wall Jump ou tomando dano)
 	if wall_jump_timer > 0 or knockback_timer > 0: return
 	
-	# --- ALTERAÇÃO AQUI: Prioridade para direção forçada ---
+	var input_dir = Input.get_axis("left", "right")
 	var dir: float
-	if direcao_forcada != 0:
+	
+	# Prioridade: Input do jogador limpa a direção forçada
+	if input_dir != 0:
+		dir = input_dir
+		direcao_forcada = 0 
+	elif direcao_forcada != 0:
 		dir = direcao_forcada
 	else:
-		dir = Input.get_axis("left", "right")
-	# -------------------------------------------------------
+		dir = 0
 	
-	# 2. TRAVA DE WALL SLIDE: 
-	# Se estiver na parede e segurando na direção DELA, travamos o visual.
+	# 2. TRAVA DE WALL SLIDE (Física e Visual)
 	if is_on_wall() and not is_on_floor() and dir != 0:
 		var wall_normal = get_wall_normal()
+		
+		# Se a direção (forçada ou input) for CONTRA a parede
 		if sign(dir) != sign(wall_normal.x):
+			velocity.x = dir * 15.0 # Mantém o contato físico
+			
+			# --- A TRAVA DO SPRITE QUE VOLTOU ---
+			# Forçamos o flip baseado na parede, ignorando o 'dir' momentaneamente
+			sprite.flip_h = (wall_normal.x < 0)
+			hitbox.scale.x = -1 if sprite.flip_h else 1
 			return 
 
 	# 3. LÓGICA DE MOVIMENTAÇÃO NORMAL
 	if dir:
 		var speed_multiplier = 1.2 if is_on_steep_slope() else 1.0
 		
-		# Controle de Momentum no ar
 		if not is_on_floor() and abs(velocity.x) > SPEED:
 			if sign(dir) == sign(velocity.x):
 				velocity.x = move_toward(velocity.x, dir * MAX_SLIDE_SPEED, 2)
 			else:
 				velocity.x = move_toward(velocity.x, dir * SPEED, 15) 
 		else:
-			# Movimento padrão
 			velocity.x = dir * SPEED * speed_multiplier
 			
-		# Atualiza a direção do personagem e da hitbox
+		# Atualização normal (fora da parede)
 		sprite.flip_h = (dir < 0)
 		hitbox.scale.x = -1 if dir < 0 else 1
 	else:
-		# Atrito/Freio (Friction)
 		var friction = 60 if is_on_floor() else 15
 		velocity.x = move_toward(velocity.x, 0, friction)
 
