@@ -14,7 +14,7 @@
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("1_mhtsl")]
-position = Vector2(3435, -460)
+position = Vector2(24, 152)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("2_w51g1")]
 position = Vector2(120, 79)

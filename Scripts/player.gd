@@ -24,6 +24,8 @@ enum WeaponType{
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+var falling_timer: float = 0.0 # Cronômetro para o estado de queda
+const FALLING_THRESHOLD = 0.5  # 0.2 segundos (ajuste conforme o gosto)
 var direcao_forcada: int = 0 # 0 = normal, 1 = direita, -1 = esquerda
 var ja_arremessou = false # Evita que nasçam 50 balas no mesmo frame
 var pode_se_mexer = true
@@ -97,6 +99,7 @@ func _physics_process(delta):
 		move_and_slide()
 		return # Sai da função e ignora os inputs de movimento
 	update_timers(delta)
+	check_fall_duration(delta)
 	handle_wall_slide(delta) # wall slide
 	update_ground_resources() # resetar habilidades
 	apply_gravity(delta)      # física
@@ -221,7 +224,7 @@ func walk_state():
 	
 func jump_state():
 	move()
-	if velocity.y > 0 and sprite.animation == "Pulando":
+	if falling_timer >= FALLING_THRESHOLD and sprite.animation == "Pulando":
 		go_to_falling()
 	# Permite pular de novo se bater em uma parede no ar
 	if wants_jump() and handle_wall_jump():
@@ -519,31 +522,32 @@ func handle_wall_slide(_delta):
 	var wall_normal = get_wall_normal()
 	var dir = Input.get_axis("left", "right")
 
-	# 1. SE ESTAVA ESCORREGANDO E A PAREDE ACABOU (Plataforma voadora)
+	# 1. SAÍDA POR FALTA DE PAREDE
 	if sprite.animation == "Escorregar" and not is_on_wall():
 		direcao_forcada = 0
-		go_to_falling()
+		status = PlayerState.jump
+		sprite.play("Pulando")
 		return
 
-	# 2. CHECAGEM DE SAÍDA VOLUNTÁRIA (Lado oposto)
+	# 2. SAÍDA POR COMANDO
 	if dir != 0 and sign(dir) == sign(wall_normal.x):
 		direcao_forcada = 0
 		if sprite.animation == "Escorregar":
-			go_to_falling()
+			status = PlayerState.jump
+			sprite.play("Pulando")
 		return
 
-	# 3. LÓGICA DE ENTRADA E MANUTENÇÃO
+	# 3. ENTRADA NO SLIDE (Apenas se estiver caindo)
 	if is_on_wall() and not is_on_floor() and velocity.y > 0:
-		sprite.flip_h = (wall_normal.x < 0) 
-
 		if sprite.animation != "Escorregar" and status == PlayerState.jump:
 			go_to_wall_slide()
+			sprite.flip_h = (wall_normal.x < 0) 
 		
-		# Ímã contra a parede
-		direcao_forcada = -sign(wall_normal.x)
-		velocity.x = direcao_forcada * 15.0
+		if sprite.animation == "Escorregar":
+			sprite.flip_h = (wall_normal.x < 0)
+			direcao_forcada = -sign(wall_normal.x)
+			velocity.x = direcao_forcada * 15.0
 	else:
-		# Reset padrão caso toque o chão ou saia por outro motivo
 		direcao_forcada = 0
 
 func is_on_steep_slope() -> bool:
@@ -594,13 +598,11 @@ func update_timers(delta):
 #Movimentação
 
 func move():
-	# 1. Travas de controle (se estiver em Wall Jump ou tomando dano)
 	if wall_jump_timer > 0 or knockback_timer > 0: return
 	
 	var input_dir = Input.get_axis("left", "right")
 	var dir: float
 	
-	# Prioridade: Input do jogador limpa a direção forçada
 	if input_dir != 0:
 		dir = input_dir
 		direcao_forcada = 0 
@@ -612,16 +614,17 @@ func move():
 	# 2. TRAVA DE WALL SLIDE (Física e Visual)
 	if is_on_wall() and not is_on_floor() and dir != 0:
 		var wall_normal = get_wall_normal()
-		
-		# Se a direção (forçada ou input) for CONTRA a parede
 		if sign(dir) != sign(wall_normal.x):
 			velocity.x = dir * 15.0 # Mantém o contato físico
 			
-			# --- A TRAVA DO SPRITE QUE VOLTOU ---
-			# Forçamos o flip baseado na parede, ignorando o 'dir' momentaneamente
-			sprite.flip_h = (wall_normal.x < 0)
-			hitbox.scale.x = -1 if sprite.flip_h else 1
-			return 
+			# --- CORREÇÃO AQUI ---
+			# Só forçamos o flip se a animação de escorregar já começou
+			if sprite.animation == "Escorregar":
+				sprite.flip_h = (wall_normal.x < 0)
+				hitbox.scale.x = -1 if sprite.flip_h else 1
+				return 
+			# Se não estiver no escorregar, deixamos o código seguir para o Item 3
+			# onde o sprite vai olhar para onde o jogador está apertando.
 
 	# 3. LÓGICA DE MOVIMENTAÇÃO NORMAL
 	if dir:
@@ -635,7 +638,7 @@ func move():
 		else:
 			velocity.x = dir * SPEED * speed_multiplier
 			
-		# Atualização normal (fora da parede)
+		# Atualização normal: segue o 'dir'
 		sprite.flip_h = (dir < 0)
 		hitbox.scale.x = -1 if dir < 0 else 1
 	else:
@@ -808,3 +811,11 @@ func aplicar_rotacao_slide(delta):
 	else:
 		# Se não estiver em slide, volta a rotação para 0 suavemente
 		sprite.rotation = lerp_angle(sprite.rotation, 0, 15 * delta)
+		
+func check_fall_duration(delta):
+	# Se estiver caindo (velocity.y > 0) e não estiver no chão nem na parede
+	if velocity.y > 0 and not is_on_floor() and not is_on_wall():
+		falling_timer += delta
+	else:
+		falling_timer = 0.0 # Reseta se tocar o chão, subir ou agarrar na parede
+		
