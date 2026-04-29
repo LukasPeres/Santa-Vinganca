@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dy8rfsnfu62ug" path="res://Scripts/death_screen.gd" id="1_ebx83"]
 [ext_resource type="Shader" uid="uid://ckt8aa2hw67ap" path="res://Shaders/death_screen.gdshader" id="2_woupl"]
+[ext_resource type="FontFile" uid="uid://b707pqumx2iav" path="res://Fontes/norse/Norse.otf" id="3_woupl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_6wu0g"]
 shader = ExtResource("2_woupl")
@@ -10,6 +11,16 @@ shader_parameter/escurecimento = 0.5
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k50ly"]
 load_path = "res://.godot/imported/morte.png-faf06cd09464dc7af0d825969ddea39f.ctex"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_woupl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_neclb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_adi57"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q15e4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6wu0g"]
 
 [node name="DeathScreen" type="CanvasLayer" unique_id=538575801 groups=["tela_morte"]]
 script = ExtResource("1_ebx83")
@@ -27,7 +38,40 @@ texture = SubResource("CompressedTexture2D_k50ly")
 expand_mode = 1
 
 [node name="RestartButton" type="Button" parent="." unique_id=2098229564]
-offset_left = 121.0
-offset_top = 77.0
-offset_right = 179.0
-offset_bottom = 92.0
+offset_left = 125.0
+offset_top = 73.0
+offset_right = 171.0
+offset_bottom = 93.0
+pivot_offset = Vector2(23, 10)
+theme_override_fonts/font = ExtResource("3_woupl")
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxEmpty_woupl")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_neclb")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_adi57")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_q15e4")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_6wu0g")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="RestartButton" unique_id=722417592]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_top = 5.0
+offset_right = 7.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_woupl")
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+vertical_alignment = 1
+
+[node name="MensagemMorte" type="RichTextLabel" parent="." unique_id=1627495348]
+offset_top = 11.0
+offset_right = 298.0
+offset_bottom = 51.0
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_woupl")
+bbcode_enabled = true
