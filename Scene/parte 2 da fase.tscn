@@ -5,11 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://fbqhowj33s0" path="res://Entities/camera.tscn" id="3_ai076"]
 [ext_resource type="PackedScene" uid="uid://bn7mw8wr88drk" path="res://Entities/fantasma.tscn" id="4_5odxa"]
 [ext_resource type="PackedScene" uid="uid://b5x6u5t8jb8al" path="res://Objects/arena_boss.tscn" id="5_5oauk"]
+[ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="6_m6fcy"]
 
 [node name="Parte2DaFase" type="Node2D" unique_id=1850883386]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("2_ai076")]
-position = Vector2(82, -8)
+position = Vector2(1381, -1388)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("3_ai076")]
 position = Vector2(56, -88)
@@ -51,3 +52,6 @@ tile_set = ExtResource("1_66ulp")
 
 [node name="arena_boss" parent="." unique_id=347159132 instance=ExtResource("5_5oauk")]
 position = Vector2(689, -2448)
+
+[node name="KillZone" parent="." unique_id=1119116355 instance=ExtResource("6_m6fcy")]
+position = Vector2(1459, -1235)

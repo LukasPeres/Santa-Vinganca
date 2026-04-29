@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://djypq0psy85gu" path="res://Scripts/caixa_dialogo.gd" id="1_nc3lc"]
 [ext_resource type="Texture2D" uid="uid://pwu6dp2xyrys" path="res://Sprites/Portraits/caixadetexto.png" id="2_xwqhd"]
 [ext_resource type="Texture2D" uid="uid://cfruwyp8qn0ky" path="res://Sprites/Portraits/molduraboneco.png" id="3_r4525"]
+[ext_resource type="FontFile" uid="uid://fakao8h8eyn8" path="res://Fontes/kiwisoda/KiwiSoda.ttf" id="4_r4525"]
 
 [node name="CaixaDialogo" type="CanvasLayer" unique_id=145387038 groups=["interface_sistema"]]
 script = ExtResource("1_nc3lc")
@@ -64,6 +65,7 @@ layout_mode = 0
 offset_left = 68.0
 offset_top = 53.0
 offset_right = 255.0
-offset_bottom = 96.0
+offset_bottom = 98.0
+theme_override_fonts/normal_font = ExtResource("4_r4525")
 theme_override_font_sizes/normal_font_size = 10
 bbcode_enabled = true
