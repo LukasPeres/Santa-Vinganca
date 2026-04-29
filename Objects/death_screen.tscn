@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://vkgrum4y8653"]
+
+[ext_resource type="Script" uid="uid://dy8rfsnfu62ug" path="res://Scripts/death_screen.gd" id="1_ebx83"]
+[ext_resource type="Shader" uid="uid://ckt8aa2hw67ap" path="res://Shaders/death_screen.gdshader" id="2_woupl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6wu0g"]
+shader = ExtResource("2_woupl")
+shader_parameter/blur_amount = 2.5
+shader_parameter/escurecimento = 0.5
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k50ly"]
+load_path = "res://.godot/imported/morte.png-faf06cd09464dc7af0d825969ddea39f.ctex"
+
+[node name="DeathScreen" type="CanvasLayer" unique_id=538575801 groups=["tela_morte"]]
+script = ExtResource("1_ebx83")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=309245472]
+material = SubResource("ShaderMaterial_6wu0g")
+offset_right = 300.0
+offset_bottom = 200.0
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1826826300]
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 216.0
+texture = SubResource("CompressedTexture2D_k50ly")
+expand_mode = 1
+
+[node name="RestartButton" type="Button" parent="." unique_id=2098229564]
+offset_left = 121.0
+offset_top = 77.0
+offset_right = 179.0
+offset_bottom = 92.0

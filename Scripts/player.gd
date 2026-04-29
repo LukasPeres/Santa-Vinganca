@@ -738,17 +738,26 @@ func take_damage(amount, from_position):
 
 #Sistema de Morte
 func die():
-	if is_dead: return # Evita chamar a morte duas vezes
+	if is_dead: return 
 	is_dead = true
-	print("LOG: Player caiu no abismo ou morreu")
+	print("LOG: Player iniciou sequência de morte")
 	
-	# Desativa colisão para ele não ficar batendo em nada enquanto morre
-	set_physics_process(false) 	
-	call_deferred("reload_scene")
+	set_physics_process(false) # Trava o movimento
+	iniciar_sequencia_morte()
+
+func iniciar_sequencia_morte():
+	await SceneTransition.fade_in()
 	
-func reload_scene():
-	var fase_atual = get_tree().current_scene.scene_file_path
-	SceneTransition.change_scene(fase_atual)
+	var tela_morte = get_tree().get_first_node_in_group("tela_morte")
+	
+	if tela_morte:
+		print("LOG: Tela de morte encontrada! Chamando aparecer().")
+		tela_morte.aparecer()
+	else:
+		# Se printar isso, você esqueceu de colocar o nó no Grupo "tela_morte"
+		print("ERRO: Sistema não encontrou nenhum nó no grupo 'tela_morte'!")
+	
+	await SceneTransition.fade_out()
 	
 func update_animation_offsets():
 	# Reset padrão para evitar que um estado suje o outro

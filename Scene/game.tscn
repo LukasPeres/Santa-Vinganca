@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://wvg04iejado3" path="res://Objects/caixa_dialogo.tscn" id="8_sagxc"]
 [ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="9_8f6ah"]
 [ext_resource type="PackedScene" uid="uid://bxm4k56sv7iwq" path="res://Objects/exit_area.tscn" id="10_twwsd"]
+[ext_resource type="PackedScene" uid="uid://vkgrum4y8653" path="res://Objects/death_screen.tscn" id="11_c6b8m"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
@@ -62,3 +63,6 @@ position = Vector2(1056, 3)
 [node name="ExitArea" parent="." unique_id=15717645 instance=ExtResource("10_twwsd")]
 position = Vector2(3608, -506)
 next_scene = "uid://c5krjso7e6k3e"
+
+[node name="DeathScreen" parent="." unique_id=538575801 instance=ExtResource("11_c6b8m")]
+layer = 5

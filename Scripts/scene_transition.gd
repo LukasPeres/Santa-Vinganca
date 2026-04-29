@@ -2,20 +2,27 @@ extends CanvasLayer
 
 @onready var rect = $rect
 
-func change_scene(target_scene_path: String):
-	# Garante que o rect comece invisível e apareça no topo
-	rect.modulate.a = 0.0 
-	rect.show() # Garante que o nó não está oculto
-
-	# 1. Fade In
+func fade_in():
+	rect.show()
 	var tween = get_tree().create_tween()
 	tween.tween_property(rect, "modulate:a", 1.0, 0.5)
 	await tween.finished
+
+func fade_out():
+	var tween = get_tree().create_tween()
+	tween.tween_property(rect, "modulate:a", 0.0, 0.5)
+	await tween.finished
+	rect.hide() # MUITO IMPORTANTE: Esconder o rect após o fade
+
+func change_scene(target_scene_path: String):
+	await fade_in()
 	
-	# 2. Muda a fase
+	# Troca a cena
 	get_tree().change_scene_to_file(target_scene_path)
 	
-	# 3. Fade Out (Um pequeno atraso ajuda a ver o efeito)
-	await get_tree().create_timer(0.1).timeout 
-	var tween2 = get_tree().create_tween()
-	tween2.tween_property(rect, "modulate:a", 0.0, 0.5)
+	# Pequena pausa para garantir que a nova cena carregou os nós
+	await get_tree().create_timer(0.1).timeout
+	
+	# Limpa qualquer rastro da tela de morte anterior (que pode ter sobrado na memória)
+	# e clareia a tela
+	await fade_out()

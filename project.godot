@@ -33,6 +33,7 @@ enemy=""
 main_camera=""
 boss=""
 interface_sistema=""
+tela_morte=""
 
 [input]
 
