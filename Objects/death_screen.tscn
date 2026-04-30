@@ -31,17 +31,17 @@ offset_right = 300.0
 offset_bottom = 200.0
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1826826300]
-offset_top = 16.0
+offset_top = 10.0
 offset_right = 300.0
-offset_bottom = 216.0
+offset_bottom = 210.0
 texture = SubResource("CompressedTexture2D_k50ly")
 expand_mode = 1
 
 [node name="RestartButton" type="Button" parent="." unique_id=2098229564]
 offset_left = 125.0
-offset_top = 73.0
+offset_top = 67.0
 offset_right = 171.0
-offset_bottom = 93.0
+offset_bottom = 87.0
 pivot_offset = Vector2(23, 10)
 theme_override_fonts/font = ExtResource("3_woupl")
 theme_override_font_sizes/font_size = 10

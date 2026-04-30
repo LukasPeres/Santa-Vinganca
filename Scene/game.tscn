@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="9_8f6ah"]
 [ext_resource type="PackedScene" uid="uid://bxm4k56sv7iwq" path="res://Objects/exit_area.tscn" id="10_twwsd"]
 [ext_resource type="PackedScene" uid="uid://vkgrum4y8653" path="res://Objects/death_screen.tscn" id="11_c6b8m"]
+[ext_resource type="PackedScene" uid="uid://dmggn2j0t4j28" path="res://Objects/pause_menu.tscn" id="12_0ka5k"]
+[ext_resource type="PackedScene" uid="uid://uwiulcexhtby" path="res://Objects/back_ground_neve.tscn" id="13_ha7wd"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
@@ -50,6 +52,7 @@ position = Vector2(1893, 108)
 position = Vector2(512, 101)
 
 [node name="CaixaDialogo" parent="." unique_id=145387038 instance=ExtResource("8_sagxc")]
+visible = false
 
 [node name="KillZone" parent="." unique_id=1119116355 instance=ExtResource("9_8f6ah")]
 position = Vector2(255, 280)
@@ -66,3 +69,8 @@ next_scene = "uid://c5krjso7e6k3e"
 
 [node name="DeathScreen" parent="." unique_id=538575801 instance=ExtResource("11_c6b8m")]
 layer = 5
+visible = false
+
+[node name="PauseMenu" parent="." unique_id=2019360026 instance=ExtResource("12_0ka5k")]
+
+[node name="BackGroundNeve" parent="." unique_id=1558798845 instance=ExtResource("13_ha7wd")]

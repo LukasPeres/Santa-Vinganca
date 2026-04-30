@@ -36,6 +36,7 @@ script = ExtResource("1_6k228")
 shape = SubResource("RectangleShape2D_swi6e")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1236141592]
+z_index = 3
 scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_r5kaw")
 animation = &"Idle"

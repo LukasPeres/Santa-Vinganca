@@ -6,11 +6,15 @@
 [ext_resource type="PackedScene" uid="uid://bn7mw8wr88drk" path="res://Entities/fantasma.tscn" id="4_5odxa"]
 [ext_resource type="PackedScene" uid="uid://b5x6u5t8jb8al" path="res://Objects/arena_boss.tscn" id="5_5oauk"]
 [ext_resource type="PackedScene" uid="uid://c8wuay0ilmhl" path="res://Objects/kill_zone.tscn" id="6_m6fcy"]
+[ext_resource type="PackedScene" uid="uid://vkgrum4y8653" path="res://Objects/death_screen.tscn" id="7_tcou6"]
+[ext_resource type="PackedScene" uid="uid://dmggn2j0t4j28" path="res://Objects/pause_menu.tscn" id="8_sg1y6"]
+[ext_resource type="PackedScene" uid="uid://d1alcqa8ncy2s" path="res://Objects/scene_transition.tscn" id="9_0g5ch"]
+[ext_resource type="PackedScene" uid="uid://uwiulcexhtby" path="res://Objects/back_ground_neve.tscn" id="10_sg1y6"]
 
 [node name="Parte2DaFase" type="Node2D" unique_id=1850883386]
 
 [node name="player" parent="." unique_id=1350439359 instance=ExtResource("2_ai076")]
-position = Vector2(48, -32)
+position = Vector2(1464, -2323)
 
 [node name="Camera" parent="." unique_id=844746867 instance=ExtResource("3_ai076")]
 position = Vector2(56, -88)
@@ -34,10 +38,10 @@ position = Vector2(1944, -1968)
 position = Vector2(312, -728)
 
 [node name="CharacterBody2D7" parent="." unique_id=1609853861 instance=ExtResource("4_5odxa")]
-position = Vector2(1504, -2032)
+position = Vector2(1553, -1932)
 
 [node name="CharacterBody2D4" parent="." unique_id=1202670436 instance=ExtResource("4_5odxa")]
-position = Vector2(1872, -1712)
+position = Vector2(2067, -1737)
 gender = 1
 
 [node name="CharacterBody2D2" parent="." unique_id=988392821 instance=ExtResource("4_5odxa")]
@@ -51,7 +55,18 @@ tile_map_data = PackedByteArray("AAAEAAAAAAABAAAAAAAEAAEAAAABAAEAAAAEAAIAAAABAAE
 tile_set = ExtResource("1_66ulp")
 
 [node name="arena_boss" parent="." unique_id=347159132 instance=ExtResource("5_5oauk")]
-position = Vector2(672, -2448)
+position = Vector2(627, -2438)
 
 [node name="KillZone" parent="." unique_id=1119116355 instance=ExtResource("6_m6fcy")]
-position = Vector2(1459, -1235)
+position = Vector2(1382, -1235)
+
+[node name="DeathScreen" parent="." unique_id=538575801 instance=ExtResource("7_tcou6")]
+visible = false
+
+[node name="PauseMenu" parent="." unique_id=2019360026 instance=ExtResource("8_sg1y6")]
+visible = false
+
+[node name="SceneTransition" parent="." unique_id=2066500144 instance=ExtResource("9_0g5ch")]
+visible = false
+
+[node name="BackGroundNeve" parent="." unique_id=1558798845 instance=ExtResource("10_sg1y6")]

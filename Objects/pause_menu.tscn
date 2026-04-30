@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://dmggn2j0t4j28"]
+
+[ext_resource type="Script" uid="uid://b3cqag24ea4jm" path="res://Scripts/pause_menu.gd" id="1_jwyry"]
+[ext_resource type="Shader" uid="uid://ckt8aa2hw67ap" path="res://Shaders/death_screen.gdshader" id="2_jwyry"]
+[ext_resource type="Texture2D" uid="uid://c7b2iql40anaj" path="res://Sprites/HUD/pause.png" id="3_mas7c"]
+[ext_resource type="FontFile" uid="uid://b707pqumx2iav" path="res://Fontes/norse/Norse.otf" id="4_mas7c"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vhxj5"]
+shader = ExtResource("2_jwyry")
+shader_parameter/blur_amount = 2.5
+shader_parameter/escurecimento = 0.5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vhxj5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_46yjt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lp5r3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_64cvv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g7x2s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mas7c"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2lj06"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8e5cf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8qg4i"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7bjtf"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=2019360026]
+process_mode = 3
+layer = 16
+script = ExtResource("1_jwyry")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1987516258]
+material = SubResource("ShaderMaterial_vhxj5")
+offset_right = 300.0
+offset_bottom = 200.0
+mouse_filter = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1542215301]
+offset_right = 300.0
+offset_bottom = 200.0
+mouse_filter = 2
+texture = ExtResource("3_mas7c")
+expand_mode = 1
+
+[node name="BtnContinuar" type="Button" parent="." unique_id=1294780656]
+offset_left = 50.0
+offset_top = 81.0
+offset_right = 115.0
+offset_bottom = 98.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_vhxj5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_46yjt")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_lp5r3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_64cvv")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_g7x2s")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="BtnContinuar" unique_id=1948594568]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("4_mas7c")
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+vertical_alignment = 1
+
+[node name="BtnMenu" type="Button" parent="." unique_id=34590380]
+offset_left = 58.0
+offset_top = 101.0
+offset_right = 109.0
+offset_bottom = 119.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mas7c")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_2lj06")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8e5cf")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_8qg4i")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_7bjtf")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="BtnMenu" unique_id=877677485]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("4_mas7c")
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+horizontal_alignment = 1

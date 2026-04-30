@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://uwiulcexhtby"]
+
+[ext_resource type="Texture2D" uid="uid://dur7tuaxmjo13" path="res://Sprites/HUD/fundo.png" id="1_ec60e"]
+
+[node name="BackGroundNeve" type="CanvasLayer" unique_id=1558798845]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1309929816]
+modulate = Color(0.78235406, 0.78235406, 0.78235406, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_ec60e")
+stretch_mode = 6
