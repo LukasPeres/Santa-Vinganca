@@ -124,7 +124,11 @@ func apply_gravity(delta):
 		return
 
 	if not is_on_floor():
-		velocity += get_gravity() * 0.8 * delta
+		# Se estiver possuído, podemos fazer ele cair mais devagar (estilo fantasma)
+		if status == PlayerState.possessed:
+			velocity += get_gravity() * 0.5 * delta # 50% da gravidade normal
+		else:
+			velocity += get_gravity() * 0.8 * delta
 
 func update_state(delta):
 	match status:
@@ -330,7 +334,7 @@ func slide_state():
 		return
 
 func possessed_state(delta):
-	apply_gravity(delta)
+	#apply_gravity(delta)
 	
 	if spasm_cooldown > 0:
 		spasm_cooldown -= delta

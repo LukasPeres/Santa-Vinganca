@@ -26,6 +26,7 @@ func aparecer():
 	
 	msg_morte.text = FRASE_LORE
 	msg_morte.visible_ratio = 0.0 
+	msg_morte.modulate = Color(1, 1, 1, 1) # Garante que comece branco
 	
 	var tween_msg = create_tween()
 	tween_msg.tween_property(msg_morte, "visible_ratio", 1.0, 1.5)
@@ -38,6 +39,7 @@ func _on_mouse_entered():
 	
 	msg_morte.text = FRASE_FURIA
 	msg_morte.visible_ratio = 1.0 
+	msg_morte.modulate = Color(1, 1, 1, 1) # Mantém branco
 	
 	txt_recomecar.modulate = Color(1, 1, 1, 1)
 	txt_recomecar.text = "[center][shake rate=20.0 level=5]Recomeçar[/shake][/center]"
@@ -50,6 +52,8 @@ func _on_mouse_exited():
 	if clicou: return
 	
 	msg_morte.text = FRASE_LORE
+	msg_morte.modulate = Color(1, 1, 1, 1) # Mantém branco
+	
 	txt_recomecar.modulate = Color(0, 0, 0, 1)
 	txt_recomecar.text = "[center]Recomeçar[/center]"
 	
@@ -57,13 +61,15 @@ func _on_mouse_exited():
 	tween.tween_property(btn_recomecar, "scale", Vector2(1.0, 1.0), 0.1)
 
 func _on_recomecar_pressed():
-	clicou = true # ATIVA A TRAVA: Agora o mouse_exited vai ignorar o reset
+	clicou = true # ATIVA A TRAVA
 	btn_recomecar.disabled = true
 	
 	# Garante que o visual fique no modo "Fúria" e "Branco" permanentemente
 	txt_recomecar.modulate = Color(1, 1, 1, 1)
 	txt_recomecar.text = "[center][shake rate=30.0 level=10]Recomeçar[/shake][/center]"
+	
 	msg_morte.text = FRASE_FURIA
+	msg_morte.modulate = Color(1, 1, 1, 1) # Travado no branco
 	
 	confirmar_renascimento()
 

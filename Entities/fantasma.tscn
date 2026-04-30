@@ -142,6 +142,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tadl6"]
+radius = 19.0
+height = 44.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_djjgj"]
 size = Vector2(27, 42)
@@ -155,7 +157,7 @@ script = ExtResource("1_ecgxc")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=561862952]
 scale = Vector2(0.7, 0.7)
 sprite_frames = SubResource("SpriteFrames_dck1r")
-animation = &"Dash_Boy"
+animation = &"Idle_Boy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=76702827]
 shape = SubResource("CapsuleShape2D_tadl6")

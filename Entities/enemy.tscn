@@ -20,7 +20,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7qchm"]
-size = Vector2(38, 37)
+size = Vector2(38, 52)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xci4f"]
 radius = 20.0
@@ -41,7 +41,7 @@ collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=829456778]
-position = Vector2(39, 12)
+position = Vector2(-1, 6)
 shape = SubResource("RectangleShape2D_7qchm")
 debug_color = Color(0.6846809, 0.5015789, 0, 0.41960785)
 
