@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://cliknrptkpedj"]
+
+[ext_resource type="Texture2D" uid="uid://d12o861glfmox" path="res://Sprites/HUD/hudzin/gameplay.png" id="1_gc22p"]
+[ext_resource type="Script" uid="uid://dwmbbgbhibrl" path="res://Scripts/hud.gd" id="1_r85nm"]
+[ext_resource type="Texture2D" uid="uid://chhvpa085wgcw" path="res://Sprites/HUD/hudzin/iconevida.png" id="2_r85nm"]
+[ext_resource type="Texture2D" uid="uid://b38req3l81bcb" path="res://Sprites/HUD/hudzin/iconesemvida.png" id="3_gjuw2"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1927999748]
+script = ExtResource("1_r85nm")
+asset_vida_cheia = ExtResource("2_r85nm")
+asset_vida_negra = ExtResource("3_gjuw2")
+
+[node name="Control" type="Control" parent="." unique_id=1020263379]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PainelPrincipal" type="TextureRect" parent="Control" unique_id=997757727]
+layout_mode = 1
+offset_right = 300.0
+offset_bottom = 198.0
+texture = ExtResource("1_gc22p")
+expand_mode = 1
+
+[node name="CoracoesContainer" type="HBoxContainer" parent="Control/PainelPrincipal" unique_id=1774318187]
+layout_mode = 0
+offset_left = -14.0
+offset_right = 104.0
+offset_bottom = 38.0
+theme_override_constants/separation = -33
+
+[node name="Coracao1" type="TextureRect" parent="Control/PainelPrincipal/CoracoesContainer" unique_id=930499761]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("2_r85nm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coracao2" type="TextureRect" parent="Control/PainelPrincipal/CoracoesContainer" unique_id=834384555]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("2_r85nm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coracao3" type="TextureRect" parent="Control/PainelPrincipal/CoracoesContainer" unique_id=1222232028]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("2_r85nm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coracao4" type="TextureRect" parent="Control/PainelPrincipal/CoracoesContainer" unique_id=1004893290]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("2_r85nm")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coracao5" type="TextureRect" parent="Control/PainelPrincipal/CoracoesContainer" unique_id=850665506]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("2_r85nm")
+expand_mode = 1
+stretch_mode = 5

@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://vkgrum4y8653" path="res://Objects/death_screen.tscn" id="11_c6b8m"]
 [ext_resource type="PackedScene" uid="uid://dmggn2j0t4j28" path="res://Objects/pause_menu.tscn" id="12_0ka5k"]
 [ext_resource type="PackedScene" uid="uid://uwiulcexhtby" path="res://Objects/back_ground_neve.tscn" id="13_ha7wd"]
+[ext_resource type="PackedScene" uid="uid://cliknrptkpedj" path="res://Objects/hud.tscn" id="14_yjs1f"]
 
 [node name="SantaVinganca" type="Node2D" unique_id=913418570]
 
@@ -74,3 +75,5 @@ visible = false
 [node name="PauseMenu" parent="." unique_id=2019360026 instance=ExtResource("12_0ka5k")]
 
 [node name="BackGroundNeve" parent="." unique_id=1558798845 instance=ExtResource("13_ha7wd")]
+
+[node name="HUD" parent="." unique_id=1927999748 instance=ExtResource("14_yjs1f")]

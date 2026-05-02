@@ -1,6 +1,7 @@
 extends CharacterBody2D #Herda Mobilidade e colisão (velocity, 
 #move_and_slide() e in_on_floor() (retorna true or false)
 
+
 #Estados do player (State Machine) - Bom para organização do código
 enum PlayerState{
 	idle,
@@ -19,6 +20,8 @@ enum WeaponType{
 	gun,
 	elf_gun
 }
+
+signal vida_alterada(nova_vida)
 
 #Referencia aos Nós
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
@@ -720,22 +723,23 @@ func _on_animated_sprite_2d_frame_changed() -> void:
 func take_damage(amount, from_position):
 	if is_dead or invincibility_timer > 0:
 		return
+	
 	# Ativa os timers
 	invincibility_timer = INVINCIBILITY_TIME
 	knockback_timer = KNOCKBACK_FREEZE_TIME
 	
 	# Aplica o empurrão (Knockback)
 	var knock_dir = sign(global_position.x - from_position.x)
-	velocity.x = knock_dir * 250 # Força horizontal
-	velocity.y = -200           # Força vertical (pulinho)
+	velocity.x = knock_dir * 250 
+	velocity.y = -200           
 	
 	health -= amount
-	print("Player vida:", health)
 	
-	# Knockback (opcional, mas recomendado)
-	var direction = sign(global_position.x - from_position.x)
-	velocity.x = direction * 150
-	velocity.y = -150
+	# --- CONEXÃO COM O HUD ---
+	vida_alterada.emit(health) # Avisa o HUD que a vida mudou
+	# -------------------------
+	
+	print("Player vida:", health)
 	
 	if health <= 0:
 		die()
