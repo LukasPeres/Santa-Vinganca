@@ -10,13 +10,15 @@
 [ext_resource type="Texture2D" uid="uid://b7nbqshrmdjpx" path="res://Sprites/HUD/hudzin/iconecarvao.png" id="8_sg4cv"]
 [ext_resource type="Texture2D" uid="uid://d3a7iwerqp78x" path="res://Sprites/HUD/hudzin/iconeelfo.png" id="9_5s53s"]
 
-[node name="HUD" type="CanvasLayer" unique_id=1927999748 node_paths=PackedStringArray("slot_bengala", "slot_carvao", "slot_elfo")]
+[node name="HUD" type="CanvasLayer" unique_id=1927999748 node_paths=PackedStringArray("slot_bengala", "slot_carvao", "slot_elfo", "label_carvao", "label_elfo")]
 script = ExtResource("1_r85nm")
 asset_vida_cheia = ExtResource("2_r85nm")
 asset_vida_negra = ExtResource("3_gjuw2")
 slot_bengala = NodePath("Control/PainelPrincipal/Habilidade_Bengala/Icone")
 slot_carvao = NodePath("Control/PainelPrincipal/Habilidade_Carvao/Icone")
 slot_elfo = NodePath("Control/PainelPrincipal/Habilidade_Elfo/Icone")
+label_carvao = NodePath("Control/PainelPrincipal/Habilidade_Carvao/Label")
+label_elfo = NodePath("Control/PainelPrincipal/Habilidade_Elfo/Label")
 
 [node name="Control" type="Control" parent="." unique_id=1020263379]
 layout_mode = 3
@@ -142,6 +144,16 @@ theme_override_fonts/font = ExtResource("7_wuq73")
 theme_override_font_sizes/font_size = 5
 text = "2"
 
+[node name="Label" type="Label" parent="Control/PainelPrincipal/Habilidade_Carvao" unique_id=2112714756]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 53.0
+offset_right = 57.0
+offset_bottom = 76.0
+theme_override_fonts/font = ExtResource("7_wuq73")
+theme_override_font_sizes/font_size = 4
+text = "3"
+
 [node name="Habilidade_Elfo" type="Control" parent="Control/PainelPrincipal" unique_id=1076137401]
 anchors_preset = 0
 offset_left = 21.0
@@ -175,4 +187,14 @@ offset_right = 19.0
 offset_bottom = 31.0
 theme_override_fonts/font = ExtResource("7_wuq73")
 theme_override_font_sizes/font_size = 5
+text = "3"
+
+[node name="Label" type="Label" parent="Control/PainelPrincipal/Habilidade_Elfo" unique_id=1983719112]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 11.0
+offset_right = 53.0
+offset_bottom = 34.0
+theme_override_fonts/font = ExtResource("7_wuq73")
+theme_override_font_sizes/font_size = 4
 text = "3"

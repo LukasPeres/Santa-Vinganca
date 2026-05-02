@@ -8,20 +8,31 @@ extends CanvasLayer
 @export var slot_carvao: Control
 @export var slot_elfo: Control
 
+# Adicione isso no topo com as outras variáveis
+@export var label_carvao: Label
+@export var label_elfo: Label
+
 func _ready():
 	await get_tree().process_frame
 	
-	# REMOVIDO O "var" DAQUI SE ELA JÁ ESTIVER NO TOPO OU SE FOR REPETIDA
 	var player = get_tree().get_first_node_in_group("player") 
 	
 	if player:
-		# Conecta os sinais via código (sem precisar da aba Sinais)
+		# Conecta os sinais de vida e troca de arma
 		player.vida_alterada.connect(atualizar_vida_display)
 		player.arma_alterada.connect(atualizar_arma_selecionada)
 		
-		# Inicializa o visual com os valores atuais do Player
+		# CONECTA OS SINAIS DE MUNIÇÃO (Importante!)
+		player.munição_carvão_alterada.connect(atualizar_munição_carvão)
+		player.munição_elfo_alterada.connect(atualizar_munição_elfo)
+		
+		# Inicializa os valores
 		atualizar_vida_display(player.health)
 		atualizar_arma_selecionada(player.current_weapon)
+		
+		# Texto inicial
+		if label_carvao: label_carvao.text = "3"
+		if label_elfo: label_elfo.text = "3"
 	else:
 		print("Erro: Player não encontrado no grupo 'player'")
 
@@ -52,3 +63,13 @@ func atualizar_arma_selecionada(tipo_arma: int):
 			slot_carvao.modulate.a = 1.0
 		2: # WeaponType.elf_gun
 			slot_elfo.modulate.a = 1.0
+
+func atualizar_munição_carvão(quantidade: int, _timer: float):
+	if label_carvao:
+		label_carvao.text = str(quantidade)
+		# Se a munição for 0, o número fica vermelho
+
+func atualizar_munição_elfo(quantidade: int, _timer: float):
+	if label_elfo:
+		label_elfo.text = str(quantidade)
+		

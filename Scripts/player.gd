@@ -28,6 +28,22 @@ signal arma_alterada(novo_tipo)
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
 @onready var hitbox: Area2D = $Hitbox #Controla Hitbox
 
+# --- SISTEMA DE MUNIÇÃO REGENERATIVA ---
+const MAX_AMMO = 3
+const REGEN_TIME = 3.0 # Tempo base para recuperar 1 bala
+
+# Munição de Carvão (Gun)
+var ammo_gun = 3
+var timer_gun = 0.0
+
+# Munição de Elfo (Elf Gun)
+var ammo_elf = 3
+var timer_elf = 0.0
+
+# Novos sinais para o HUD
+signal munição_carvão_alterada(quantidade, timer_atual)
+signal munição_elfo_alterada(quantidade, timer_atual)
+
 var falling_timer: float = 0.0 # Cronômetro para o estado de queda
 const FALLING_THRESHOLD = 0.5  # 0.2 segundos (ajuste conforme o gosto)
 var direcao_forcada: int = 0 # 0 = normal, 1 = direita, -1 = esquerda
@@ -113,6 +129,7 @@ func _physics_process(delta):
 	aplicar_rotacao_slide(delta) # <--- Adicione aqui
 
 	floor_snap_length = 8.0 if velocity.y >= 0 else 0.0
+	update_ammo_regen(delta) # <--- Adicione esta linha
 	move_and_slide()          # movimento final
 
 func update_ground_resources():
@@ -675,9 +692,31 @@ func use_weapon():
 				go_to_attack_2_state()
 			else:
 				go_to_attack_state()
-		# Em vez de atirar direto, mudamos para o estado de arremesso
-		WeaponType.gun, WeaponType.elf_gun:
-			go_to_throw_state()
+		
+		WeaponType.gun:
+			if ammo_gun > 0:
+				ammo_gun -= 1
+				# LOGICA DE FILA:
+				# Se o timer for 0, começa agora. 
+				# Se já tiver tempo, apenas adicionamos o "custo" de mais uma bala na fila.
+				if timer_gun <= 0:
+					timer_gun = REGEN_TIME
+				else:
+					timer_gun += REGEN_TIME 
+				
+				munição_carvão_alterada.emit(ammo_gun, timer_gun)
+				go_to_throw_state()
+
+		WeaponType.elf_gun:
+			if ammo_elf > 0:
+				ammo_elf -= 1
+				if timer_elf <= 0:
+					timer_elf = REGEN_TIME
+				else:
+					timer_elf += REGEN_TIME
+					
+				munição_elfo_alterada.emit(ammo_elf, timer_elf)
+				go_to_throw_state()
 
 func shoot_straight():
 	var bullet = preload("res://Entities/bullet.tscn").instantiate()
@@ -705,6 +744,31 @@ func shoot_elf():
 	bullet.global_position = global_position + Vector2(20 * dir, -25)
 	
 	bullet.launch(dir)
+	
+func update_ammo_regen(delta):
+	# REGENERAÇÃO CARVÃO
+	if ammo_gun < MAX_AMMO:
+		timer_gun -= delta
+		
+		# Verificamos se o tempo total baixou o suficiente para ganhar UMA bala
+		# Ex: Se tinha 4.5s e agora tem 2.9s, você recuperou a primeira bala!
+		# Mas o timer continua descendo para a próxima.
+		
+		# Cálculo: se o timer_gun chegar em 3.0 (quando tinha 2 balas faltando) 
+		# ou em 0.0 (quando tinha 1 faltando)
+		
+		# Forma mais simples de resolver o seu problema:
+		if timer_gun <= (MAX_AMMO - ammo_gun - 1) * REGEN_TIME:
+			ammo_gun += 1
+			munição_carvão_alterada.emit(ammo_gun, timer_gun)
+			print("Recuperou 1 bala de Carvão! Total: ", ammo_gun)
+
+	# REGENERAÇÃO ELFO
+	if ammo_elf < MAX_AMMO:
+		timer_elf -= delta
+		if timer_elf <= (MAX_AMMO - ammo_elf - 1) * REGEN_TIME:
+			ammo_elf += 1
+			munição_elfo_alterada.emit(ammo_elf, timer_elf)
 
 #hitbox do ataque, so funciona no grupo enemy
 func _on_hitbox_body_entered(body: Node2D) -> void:
