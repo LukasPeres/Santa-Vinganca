@@ -4,11 +4,19 @@
 [ext_resource type="Script" uid="uid://dwmbbgbhibrl" path="res://Scripts/hud.gd" id="1_r85nm"]
 [ext_resource type="Texture2D" uid="uid://chhvpa085wgcw" path="res://Sprites/HUD/hudzin/iconevida.png" id="2_r85nm"]
 [ext_resource type="Texture2D" uid="uid://b38req3l81bcb" path="res://Sprites/HUD/hudzin/iconesemvida.png" id="3_gjuw2"]
+[ext_resource type="Texture2D" uid="uid://10a6l6yv2h5g" path="res://Sprites/HUD/hudzin/iconebengalas.png" id="5_sts2w"]
+[ext_resource type="Texture2D" uid="uid://cgexr5trb5oej" path="res://Sprites/HUD/hudzin/iconebind.png" id="6_tob73"]
+[ext_resource type="FontFile" uid="uid://dybhde8tir8eh" path="res://Fontes/norse/Norsebold.otf" id="7_wuq73"]
+[ext_resource type="Texture2D" uid="uid://b7nbqshrmdjpx" path="res://Sprites/HUD/hudzin/iconecarvao.png" id="8_sg4cv"]
+[ext_resource type="Texture2D" uid="uid://d3a7iwerqp78x" path="res://Sprites/HUD/hudzin/iconeelfo.png" id="9_5s53s"]
 
-[node name="HUD" type="CanvasLayer" unique_id=1927999748]
+[node name="HUD" type="CanvasLayer" unique_id=1927999748 node_paths=PackedStringArray("slot_bengala", "slot_carvao", "slot_elfo")]
 script = ExtResource("1_r85nm")
 asset_vida_cheia = ExtResource("2_r85nm")
 asset_vida_negra = ExtResource("3_gjuw2")
+slot_bengala = NodePath("Control/PainelPrincipal/Habilidade_Bengala/Icone")
+slot_carvao = NodePath("Control/PainelPrincipal/Habilidade_Carvao/Icone")
+slot_elfo = NodePath("Control/PainelPrincipal/Habilidade_Elfo/Icone")
 
 [node name="Control" type="Control" parent="." unique_id=1020263379]
 layout_mode = 3
@@ -22,6 +30,7 @@ offset_right = 300.0
 offset_bottom = 198.0
 texture = ExtResource("1_gc22p")
 expand_mode = 1
+metadata/_edit_lock_ = true
 
 [node name="CoracoesContainer" type="HBoxContainer" parent="Control/PainelPrincipal" unique_id=1774318187]
 layout_mode = 0
@@ -64,3 +73,106 @@ layout_mode = 2
 texture = ExtResource("2_r85nm")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="Habilidade_Bengala" type="Control" parent="Control/PainelPrincipal" unique_id=1178301743]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+metadata/_edit_lock_ = true
+
+[node name="Icone" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Bengala" unique_id=839715076]
+layout_mode = 0
+offset_left = -2.0
+offset_top = 55.0
+offset_right = 20.717394
+offset_bottom = 66.0
+texture = ExtResource("5_sts2w")
+expand_mode = 1
+
+[node name="Caixinha" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Bengala" unique_id=1928078312]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 64.0
+offset_right = 18.333334
+offset_bottom = 76.0
+texture = ExtResource("6_tob73")
+expand_mode = 1
+
+[node name="Numero" type="Label" parent="Control/PainelPrincipal/Habilidade_Bengala" unique_id=1411508304]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 67.0
+offset_right = 17.434784
+offset_bottom = 73.0
+theme_override_fonts/font = ExtResource("7_wuq73")
+theme_override_font_sizes/font_size = 5
+text = "1"
+
+[node name="Habilidade_Carvao" type="Control" parent="Control/PainelPrincipal" unique_id=1659546593]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+metadata/_edit_lock_ = true
+
+[node name="Icone" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Carvao" unique_id=2032698921]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 51.0
+offset_right = 37.679245
+offset_bottom = 70.0
+texture = ExtResource("8_sg4cv")
+expand_mode = 1
+
+[node name="Caixinha" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Carvao" unique_id=4484393]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 34.333336
+offset_bottom = 76.0
+texture = ExtResource("6_tob73")
+expand_mode = 1
+
+[node name="Numero" type="Label" parent="Control/PainelPrincipal/Habilidade_Carvao" unique_id=1988822215]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 67.0
+offset_right = 33.434784
+offset_bottom = 73.0
+theme_override_fonts/font = ExtResource("7_wuq73")
+theme_override_font_sizes/font_size = 5
+text = "2"
+
+[node name="Habilidade_Elfo" type="Control" parent="Control/PainelPrincipal" unique_id=1076137401]
+anchors_preset = 0
+offset_left = 21.0
+offset_top = 41.0
+offset_right = 53.0
+offset_bottom = 76.0
+
+[node name="Icone" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Elfo" unique_id=1177831470]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 9.0
+offset_right = 31.6
+offset_bottom = 25.0
+texture = ExtResource("9_5s53s")
+expand_mode = 1
+
+[node name="Caixinha" type="TextureRect" parent="Control/PainelPrincipal/Habilidade_Elfo" unique_id=1976764089]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 23.0
+offset_right = 28.333334
+offset_bottom = 35.0
+texture = ExtResource("6_tob73")
+expand_mode = 1
+
+[node name="Numero" type="Label" parent="Control/PainelPrincipal/Habilidade_Elfo" unique_id=1992565546]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 26.0
+offset_right = 19.0
+offset_bottom = 31.0
+theme_override_fonts/font = ExtResource("7_wuq73")
+theme_override_font_sizes/font_size = 5
+text = "3"

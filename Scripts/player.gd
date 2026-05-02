@@ -22,6 +22,7 @@ enum WeaponType{
 }
 
 signal vida_alterada(nova_vida)
+signal arma_alterada(novo_tipo)
 
 #Referencia aos Nós
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D #Controla animações
@@ -657,12 +658,15 @@ func check_weapon_swap():
 
 	if Input.is_action_just_pressed("weapon_1"):
 		current_weapon = WeaponType.melee
+		arma_alterada.emit(current_weapon)
 
 	if Input.is_action_just_pressed("weapon_2"):
 		current_weapon = WeaponType.gun
+		arma_alterada.emit(current_weapon)
 
 	if Input.is_action_just_pressed("weapon_3"):
 		current_weapon = WeaponType.elf_gun
+		arma_alterada.emit(current_weapon)
 		
 func use_weapon():
 	match current_weapon:
