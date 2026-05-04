@@ -37,7 +37,7 @@ func _physics_process(delta):
 			if body.has_method("take_damage"):
 				# Mesmo que seja uma parábola, mandamos a direção horizontal dela
 				var dir_impacto = Vector2(direction, 0)
-				body.take_damage(1, global_position, dir_impacto)
+				body.take_damage(2, global_position, dir_impacto)
 			queue_free()
 		else:
 			# Se bater no chão ou parede (qualquer coisa que não seja inimigo)

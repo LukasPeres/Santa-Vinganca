@@ -279,20 +279,21 @@ func attack_state():
 	#Quando precionar pular E estamos no chão, pula, mas não troca de estado
 	#Para não quebrar a animação de ataque
 	if wants_jump() and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+		hitbox.monitoring = false
+		go_to_jump_state() 
+		return 
 	
 	#Se a animação terminou, a hitbox é desligada
 	if not sprite.is_playing():
 		hitbox.monitoring = false
 		
 		#Se depois do ataque voce esta no ar, muda para pular
+	if not sprite.is_playing():
+		hitbox.monitoring = false
 		if not is_on_floor():
-			status = PlayerState.jump
-			return
-		#Se a velocidade é 0 muda pra parado
+			go_to_falling()
 		elif velocity.x == 0:
 			go_to_idle_state()
-		#Se velocidade é diferente de 0 vai para andando
 		else:
 			go_to_walk_state()
 
@@ -514,10 +515,14 @@ func wants_jump():
 	return Input.is_action_just_pressed("jump")
 
 func wants_attack():
+	# Se estiver na animação de escorregar, bloqueia o ataque imediatamente
+	if sprite.animation == "Escorregar":
+		return false
+		
 	var current_time = Time.get_ticks_msec()
 	if Input.is_action_just_pressed("attack"):
 		if current_time - last_attack_timer >= ATTACK_COOLDOWN_MS:
-			last_attack_timer = current_time # Registra o momento do ataque
+			last_attack_timer = current_time 
 			return true
 	return false
 
@@ -775,7 +780,7 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("enemy"):
 		# 1. Definimos a direção baseada no flip do sprite
 		var direcao_golpe = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
-		
+		frame_impact(0.05, 0.1)
 		# 2. Chamamos a função passando os TRÊS argumentos:
 		# amount (1), from_position (global_position), direcao_golpe (o vetor que criamos)
 		if body.has_method("take_damage"):
@@ -904,3 +909,9 @@ func check_fall_duration(delta):
 	else:
 		falling_timer = 0.0 # Reseta se tocar o chão, subir ou agarrar na parede
 		
+func frame_impact(time_scale: float, duration: float):
+	Engine.time_scale = time_scale
+	# Se você tiver uma Camera2D com um script de shake:
+	# get_viewport().get_camera_2d().shake(0.2, 15) 
+	await get_tree().create_timer(duration * time_scale).timeout
+	Engine.time_scale = 1.0
