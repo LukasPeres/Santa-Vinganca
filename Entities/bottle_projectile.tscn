@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://ctso5qifguw3s"]
+
+[ext_resource type="Script" uid="uid://dd5gekffsnwu1" path="res://Scripts/bottle_projectile.gd" id="1_f6wc2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rt0ep"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_f6wc2"]
+
+[node name="bottle_projectile" type="RigidBody2D" unique_id=632001268]
+script = ExtResource("1_f6wc2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1547782870]
+shape = SubResource("RectangleShape2D_rt0ep")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=246753190]
+sprite_frames = SubResource("SpriteFrames_f6wc2")

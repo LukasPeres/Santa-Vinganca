@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cc1ce35km31gt"]
+
+[ext_resource type="Script" uid="uid://b8d8qpx675kj8" path="res://Scripts/bottle_shard.gd" id="1_3yk8w"]
+[ext_resource type="Texture2D" uid="uid://cjojyvoiv0hva" path="res://Sprites/Personagens/Boneco_neve/bola-de-neve.png" id="2_bris0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lkqfs"]
+
+[node name="bottle_shard" type="Area2D" unique_id=933530610]
+script = ExtResource("1_3yk8w")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=641691490]
+shape = SubResource("RectangleShape2D_lkqfs")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1403609278]
+texture = ExtResource("2_bris0")

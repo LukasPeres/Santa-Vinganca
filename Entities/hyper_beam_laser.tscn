@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cen1nfkso7upf"]
+
+[ext_resource type="Script" uid="uid://dejk1c5fdmh81" path="res://Scripts/hyper_beam_laser.gd" id="1_s2ljw"]
+[ext_resource type="Texture2D" uid="uid://dw5vfkabwept0" path="res://Sprites/Personagens/Boneco_neve/raio-meio.png" id="2_wtaw5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yqmvf"]
+
+[node name="hyper_beam_laser" type="Area2D" unique_id=1934248550]
+script = ExtResource("1_s2ljw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=654830757]
+shape = SubResource("RectangleShape2D_yqmvf")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=123307919]
+texture = ExtResource("2_wtaw5")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=551036365]

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://b3e5k0andtmbq"]
+
+[ext_resource type="Script" uid="uid://co1qx2sgasfvu" path="res://Scripts/fire_trail.gd" id="1_lvm1v"]
+[ext_resource type="Texture2D" uid="uid://cjojyvoiv0hva" path="res://Sprites/Personagens/Boneco_neve/bola-de-neve.png" id="2_3hsks"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ysh2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lvm1v"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_3hsks")
+}],
+"loop": false,
+"name": &"Fogo",
+"speed": 5.0
+}]
+
+[node name="fire_trail" type="Area2D" unique_id=372951863]
+script = ExtResource("1_lvm1v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=552453673]
+shape = SubResource("RectangleShape2D_1ysh2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=13242608]
+sprite_frames = SubResource("SpriteFrames_lvm1v")
+animation = &"Fogo"

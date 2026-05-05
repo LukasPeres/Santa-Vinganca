@@ -11,7 +11,8 @@ enum PlayerState{
 	dash,
 	slide, 
 	possessed,
-	throw
+	throw,
+	hit
 }
 
 #State Machine das armas
@@ -169,6 +170,8 @@ func update_state(delta):
 			possessed_state(delta)
 		PlayerState.throw: 
 			throw_state()  
+		PlayerState.hit:
+			apply_gravity(delta)
 #ESTADOS
 func idle_state():#Importante - Ordem: Ataque, Andar, Pular
 	move() #Possibilita movimento nesse estado
@@ -487,7 +490,27 @@ func go_to_throw_state():
 	status = PlayerState.throw
 	ja_arremessou = false # Reseta para o novo arremesso
 	sprite.play("Arremessar")
+
+func go_to_hit_state():
+	status = PlayerState.hit
 	
+	# 1. Toca a animação imediatamente ao entrar no estado
+	if sprite.sprite_frames.has_animation("ReceberDano"):
+		sprite.play("ReceberDano")
+	
+	# 2. Opcional: Se quiser que a animação "trave" no primeiro frame de dor
+	# sprite.stop() 
+
+	# 3. Espera o tempo que você já definiu para o knockback (KNOCKBACK_FREEZE_TIME)
+	await get_tree().create_timer(knockback_timer).timeout
+	
+	# 4. Retorno aos estados normais
+	if not is_dead:
+		if is_on_floor():
+			go_to_idle_state()
+		else:
+			go_to_falling()
+
 func apply_spasm():
 	spasm_count += 1
 	spasm_cooldown = 0.6 
@@ -508,8 +531,14 @@ func apply_spasm():
 		print("LOG: Papanel se libertou!")
 		# Pequeno knockback pra cima pra dar feedback visual de que saiu
 		velocity.y = -150 
-		take_damage(1, global_position)
-		go_to_idle_state()
+		var direcao_fuga = 1.0 if sprite.flip_h else -1.0
+	
+	# 2. Criamos a origem do dano no lado OPOSTO para onde queremos ir.
+	# Se queremos ir para a direita (1.0), fingimos que o dano veio da esquerda (-10).
+		var fake_origin = global_position + Vector2(-10 * direcao_fuga, 0)
+	
+	# 3. Agora o take_damage fará a conta certa!
+		take_damage(1, fake_origin)
 
 func wants_jump():
 	return Input.is_action_just_pressed("jump")
@@ -780,7 +809,6 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("enemy"):
 		# 1. Definimos a direção baseada no flip do sprite
 		var direcao_golpe = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
-		frame_impact(0.05, 0.1)
 		# 2. Chamamos a função passando os TRÊS argumentos:
 		# amount (1), from_position (global_position), direcao_golpe (o vetor que criamos)
 		if body.has_method("take_damage"):
@@ -804,9 +832,11 @@ func take_damage(amount, from_position):
 	# Aplica o empurrão (Knockback)
 	var knock_dir = sign(global_position.x - from_position.x)
 	velocity.x = knock_dir * 250 
-	velocity.y = -200           
+	velocity.y = -300           
 	
 	health -= amount
+	
+	go_to_hit_state()
 	
 	# --- CONEXÃO COM O HUD ---
 	vida_alterada.emit(health) # Avisa o HUD que a vida mudou
@@ -909,9 +939,3 @@ func check_fall_duration(delta):
 	else:
 		falling_timer = 0.0 # Reseta se tocar o chão, subir ou agarrar na parede
 		
-func frame_impact(time_scale: float, duration: float):
-	Engine.time_scale = time_scale
-	# Se você tiver uma Camera2D com um script de shake:
-	# get_viewport().get_camera_2d().shake(0.2, 15) 
-	await get_tree().create_timer(duration * time_scale).timeout
-	Engine.time_scale = 1.0

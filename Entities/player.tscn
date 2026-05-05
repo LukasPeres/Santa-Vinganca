@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://cg3kskum08dma" path="res://Sprites/Personagens/Papanel/Papanel-andando-possuido.png" id="7_ua6mu"]
 [ext_resource type="Texture2D" uid="uid://b2ufn834r28tk" path="res://Sprites/Personagens/Papanel/Papanel-pulando.png" id="8_xy0x1"]
 [ext_resource type="Texture2D" uid="uid://dg56lb4kmwrpc" path="res://Sprites/Personagens/Papanel/Papanel-slide.png" id="11_klb6e"]
+[ext_resource type="Texture2D" uid="uid://rfug8ahbqvec" path="res://Sprites/Personagens/Papanel/Papanel-dano.png" id="12_klb6e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_taegk"]
 size = Vector2(19, 45)
@@ -312,6 +313,14 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
+"duration": 1.4,
+"texture": ExtResource("12_klb6e")
+}],
+"loop": true,
+"name": &"ReceberDano",
+"speed": 5.0
+}, {
+"frames": [{
 "duration": 1.0,
 "texture": ExtResource("11_klb6e")
 }],
@@ -337,7 +346,7 @@ shape = SubResource("RectangleShape2D_taegk")
 position = Vector2(0, -17)
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_xd3k7")
-animation = &"Arremessar"
+animation = &"ReceberDano"
 autoplay = "Idle"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=3414594]
