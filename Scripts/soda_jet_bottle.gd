@@ -1,30 +1,19 @@
-extends Node2D
+extends Area2D
 
-const JET_SCENE     = preload("res://Entities/soda_jet_bottle.tscn")
-const LIFETIME      = 5.0
-const ROTATION_SPEED = 120.0  # Graus por segundo
-const JET_INTERVAL  = 0.4
+var direction: Vector2 = Vector2.ZERO 
+@export var speed: float = 200.0  # Velocidade do projétil voando
+const LIFETIME = 2.0
 
-var timer:     float = 0.0
-var jet_timer: float = 0.0
+func _ready() -> void:
+	rotation = direction.angle()
+	# Timer para sumir
+	get_tree().create_timer(LIFETIME).timeout.connect(queue_free)
 
 func _physics_process(delta: float) -> void:
-	timer     += delta
-	jet_timer += delta
-	rotation_degrees += ROTATION_SPEED * delta
+	# Agora ele realmente se move para frente!
+	position += direction * speed * delta
 
-	if jet_timer >= JET_INTERVAL:
-		jet_timer = 0.0
-		_fire_jets()
-
-	if timer >= LIFETIME:
-		queue_free()
-
-func _fire_jets() -> void:
-	# Dispara 2 jatos opostos baseados na rotação atual
-	for i in 2:
-		var jet = JET_SCENE.instantiate()
-		var angle := rotation + (PI * i)  # 0° e 180°
-		jet.global_position = global_position
-		jet.direction = Vector2(cos(angle), sin(angle))
-		get_parent().add_child(jet)
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player") and body.has_method("take_damage"):
+		body.take_damage(1, global_position)
+		queue_free() # Some ao tocar no player

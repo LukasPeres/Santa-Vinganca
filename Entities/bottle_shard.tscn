@@ -3,13 +3,33 @@
 [ext_resource type="Script" uid="uid://b8d8qpx675kj8" path="res://Scripts/bottle_shard.gd" id="1_3yk8w"]
 [ext_resource type="Texture2D" uid="uid://cjojyvoiv0hva" path="res://Sprites/Personagens/Boneco_neve/bola-de-neve.png" id="2_bris0"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_lkqfs"]
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bris0"]
+bounce = 0.4
 
-[node name="bottle_shard" type="Area2D" unique_id=933530610]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lkqfs"]
+size = Vector2(7.5, 7.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bris0"]
+size = Vector2(7, 7)
+
+[node name="bottle_shard" type="RigidBody2D" unique_id=1492607470]
+collision_layer = 2
+physics_material_override = SubResource("PhysicsMaterial_bris0")
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_3yk8w")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=641691490]
 shape = SubResource("RectangleShape2D_lkqfs")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1403609278]
+position = Vector2(-4.7683716e-07, 4.7683716e-07)
+scale = Vector2(0.39999998, 0.4)
 texture = ExtResource("2_bris0")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1953233809]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=368465003]
+shape = SubResource("RectangleShape2D_bris0")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

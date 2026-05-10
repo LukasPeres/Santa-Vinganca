@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c7oympcdhd8fv"]
 
 [ext_resource type="Script" uid="uid://c7c677mfgovgw" path="res://Scripts/boss.gd" id="1_pmuss"]
+[ext_resource type="Shader" uid="uid://dhkdctet2p3eq" path="res://Shaders/boss.gdshader" id="2_bqvjc"]
 [ext_resource type="Texture2D" uid="uid://rh1h1krqdhew" path="res://Sprites/Personagens/Urso/urso-fase-1-andando.png" id="2_jluji"]
 [ext_resource type="Texture2D" uid="uid://ybxuxt0mfog6" path="res://Sprites/Personagens/Urso/urso-fase-1-jogando.png" id="3_bqvjc"]
 [ext_resource type="Texture2D" uid="uid://buqfo36441kpn" path="res://Sprites/Personagens/Urso/urso-fase-2-investida.png" id="4_8jn8l"]
@@ -9,6 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://cja31hewyt0y6" path="res://Sprites/Personagens/Urso/urso fase 2.png" id="7_f1nbd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jha6m"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8jn8l"]
+shader = ExtResource("2_bqvjc")
+shader_parameter/active = false
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_esjpi"]
 atlas = ExtResource("2_jluji")
@@ -105,22 +110,22 @@ region = Rect2(1050, 0, 150, 94)
 [sub_resource type="SpriteFrames" id="SpriteFrames_pmuss"]
 animations = [{
 "frames": [{
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_esjpi")
 }, {
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_th314")
 }, {
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_gim8c")
 }, {
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_sa3md")
 }, {
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_4uv2w")
 }, {
-"duration": 1.0,
+"duration": 0.7,
 "texture": SubResource("AtlasTexture_n2t7g")
 }],
 "loop": true,
@@ -239,17 +244,20 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cav2n"]
 
 [node name="Boss" type="CharacterBody2D" unique_id=1986944501 groups=["boss"]]
+collision_layer = 2
 script = ExtResource("1_pmuss")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1523971702]
 shape = SubResource("RectangleShape2D_jha6m")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=375253800]
+material = SubResource("ShaderMaterial_8jn8l")
 position = Vector2(0, -19)
 sprite_frames = SubResource("SpriteFrames_pmuss")
-animation = &"Carga2"
+animation = &"Andando1"
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1132164279]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=210751876]
 shape = SubResource("RectangleShape2D_cav2n")
@@ -260,6 +268,7 @@ shape = SubResource("RectangleShape2D_cav2n")
 shape = SubResource("RectangleShape2D_cav2n")
 
 [node name="MeleeHitbox" type="Area2D" parent="." unique_id=2035538441]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MeleeHitbox" unique_id=1674458859]
 shape = SubResource("RectangleShape2D_cav2n")
@@ -270,5 +279,5 @@ target_position = Vector2(-70, 0)
 [node name="WallCheckerRight" type="RayCast2D" parent="." unique_id=2121987983]
 target_position = Vector2(70, 0)
 
-[connection signal="animation_changed" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_changed"]
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="frame_changed" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_frame_changed"]

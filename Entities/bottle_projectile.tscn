@@ -1,12 +1,25 @@
 [gd_scene format=3 uid="uid://ctso5qifguw3s"]
 
 [ext_resource type="Script" uid="uid://dd5gekffsnwu1" path="res://Scripts/bottle_projectile.gd" id="1_f6wc2"]
+[ext_resource type="Texture2D" uid="uid://cjojyvoiv0hva" path="res://Sprites/Personagens/Boneco_neve/bola-de-neve.png" id="2_vty4d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rt0ep"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_f6wc2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_vty4d")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="bottle_projectile" type="RigidBody2D" unique_id=632001268]
+collision_layer = 2
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_f6wc2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1547782870]
@@ -14,3 +27,5 @@ shape = SubResource("RectangleShape2D_rt0ep")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=246753190]
 sprite_frames = SubResource("SpriteFrames_f6wc2")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

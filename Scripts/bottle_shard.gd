@@ -1,27 +1,37 @@
-extends Area2D
+extends RigidBody2D
 
-# Dura 3 segundos, pisca no último segundo
-const LIFETIME     = 3.0
-const BLINK_START  = 2.0  # Começa a piscar aos 2s
+const LIFETIME = 3.0
+const BLINK_START = 2.0
 
 var timer: float = 0.0
-
-@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var sprite: Sprite2D = $Sprite2D
 
 func setup(angle: float) -> void:
-	var dist := randf_range(20, 60)
-	position += Vector2(cos(angle) * dist, sin(angle) * dist)
+	# Em vez de mover a posição na mão, damos um impulso físico real
+	var força := randf_range(150, 300)
+	var direção = Vector2(cos(angle), sin(angle))
+	
+	# Aplica o impulso inicial (faz o caco voar)
+	apply_central_impulse(direção * força)
+	
+	# Dá uma rotação aleatória inicial para ele girar enquanto cai
+	angular_velocity = randf_range(-10, 10)
 
-func _physics_process(delta: float) -> void:
+func _process(delta: float) -> void:
 	timer += delta
 
-	# Efeito de piscar no último segundo
-	if timer >= BLINK_START:
-		sprite.visible = int(timer * 8) % 2 == 0  # 8 piscadas por segundo
+	if not sprite: return
 
+	# Lógica de Piscar
+	if timer >= BLINK_START:
+		sprite.visible = int(timer * 10) % 2 == 0
+
+	# Lógica de Sumir
 	if timer >= LIFETIME:
 		queue_free()
 
+# Para dar dano no player, o player deve estar em uma camada que o RigidBody detecte
+# Ou você pode manter uma Area2D pequena dentro do RigidBody para dano.
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") and body.has_method("take_damage"):
 		body.take_damage(1, global_position)
