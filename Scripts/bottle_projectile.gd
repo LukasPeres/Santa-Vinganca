@@ -2,29 +2,33 @@ extends RigidBody2D
 
 # --- CONFIGURAÇÕES DE CONTROLE ---
 @export var velocidade_arremesso: float = 300.0
-@export var velocidade_giro_soda: float = 200.0 # Aumentei para um efeito espiral legal
-@export var intervalo_tiro: float = 0.5        # Tiros mais rápidos
+@export var velocidade_giro_soda: float = 200.0 
+@export var intervalo_tiro: float = 0.5        
 @export var gravidade_customizada: float = 0.8
 
 var modo_soda: bool = false 
 var active: bool = true
 var timer_soda: float = 0.0
 var timer_tiro: float = 0.0
+var face_dir: int = 1 # <--- ADICIONADO: Para guardar a direção do Boss
 
 @onready var SHARD_SCENE = preload("res://Entities/bottle_shard.tscn")
 @onready var JET_SCENE = preload("res://Entities/soda_jet_bottle.tscn")
 
-# ESSA FUNÇÃO É ESSENCIAL: O Boss chama ela ao criar a garrafa
 func setup(dir: int, angle_offset: float, is_soda: bool) -> void:
 	modo_soda = is_soda
+	face_dir = dir # <--- ADICIONADO: Salva se é -1 ou 1
 	active = true
 	gravity_scale = gravidade_customizada
 	
-	# Calcula o vetor de lançamento
+	# <--- ADICIONADO: Ajusta a rotação inicial para a garrafa não "nascer" de costas
+	if face_dir == -1:
+		rotation_degrees = 180
+	else:
+		rotation_degrees = 0
+	
 	var angle := deg_to_rad(angle_offset - 45)
 	linear_velocity = Vector2(cos(angle) * velocidade_arremesso * dir, sin(angle) * velocidade_arremesso)
-	
-	print("LOG: Garrafa configurada. Modo Soda: ", modo_soda)
 
 func _physics_process(delta: float) -> void:
 	if modo_soda:
@@ -33,14 +37,16 @@ func _physics_process(delta: float) -> void:
 func _comportamento_soda(delta: float) -> void:
 	timer_soda += delta
 	
-	# 0.6s é o tempo de voo antes de travar no ar e começar a girar
 	if timer_soda > 0.6 and timer_soda < 4.0:
 		if not freeze:
 			freeze = true 
+			# <--- ADICIONADO: Zera a velocidade para ela não "deslizar" no ar enquanto atira
+			linear_velocity = Vector2.ZERO
+			angular_velocity = 0
 		
-		rotation_degrees += velocidade_giro_soda * delta 
+		# <--- ALTERADO: Multiplicamos pelo face_dir para o giro seguir o sentido do arremesso
+		rotation_degrees += (velocidade_giro_soda * face_dir) * delta 
 		
-		# Lógica de tiros contínuos (Efeito Espiral)
 		timer_tiro += delta
 		if timer_tiro >= intervalo_tiro:
 			timer_tiro = 0.0
@@ -50,14 +56,11 @@ func _comportamento_soda(delta: float) -> void:
 		queue_free()
 
 func _disparar_balas() -> void:
-	for i in 2: # Atira de dois lados opostos da garrafa
+	for i in 2: 
 		var jet = JET_SCENE.instantiate()
-		# Adicionamos ao parent para as balas não girarem junto com a "mãe"
 		get_parent().add_child(jet)
-		
 		jet.global_position = global_position
 		
-		# Define a direção baseada na rotação atual da garrafa
 		var angle = rotation + (PI * i) 
 		jet.direction = Vector2(cos(angle), sin(angle))
 

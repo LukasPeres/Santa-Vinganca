@@ -871,6 +871,7 @@ func iniciar_sequencia_morte():
 	await SceneTransition.fade_out()
 	
 func update_animation_offsets():
+	var face_dir = -1 if sprite.flip_h else 1
 	# Reset padrão para evitar que um estado suje o outro
 	sprite.offset = Vector2.ZERO
 
@@ -896,10 +897,10 @@ func update_animation_offsets():
 		# Aqui é o segredo: mudamos o offset baseado no NOME da animação
 		if sprite.animation == "Ataque_1":
 			sprite.offset.y = -10  # Ajuste para o primeiro golpe
-			sprite.offset.x = 0   # Se precisar mover para os lados também
+			sprite.offset.x = 9 * face_dir  # Se precisar mover para os lados também
 		elif sprite.animation == "Ataque_2":
-			sprite.offset.y = -8  # Ajuste diferente para o segundo golpe
-			sprite.offset.x = 2   # Exemplo: se ele der um passo a frente
+			sprite.offset.y = -7  # Ajuste diferente para o segundo golpe
+			sprite.offset.x = 2 * face_dir   # Exemplo: se ele der um passo a frente
 			
 	# 2. Se não estiver atacando, segue a lógica normal dos outros estados
 	else:

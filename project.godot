@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="SantaVinganca"
-run/main_scene="uid://ctya1al18xd62"
+run/main_scene="uid://c5krjso7e6k3e"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
